@@ -1,0 +1,283 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ patient.nom }} {{ patient.prenom }} - Détails{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+  <div class="page-inner">
+
+    <!-- Entête -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="fw-bold mb-0">{{ patient.nom }} {{ patient.prenom }}</h3>
+      <span class="badge bg-primary fs-6 px-3 py-2">{{ patient.get_sexe_display }}</span>
+    </div>
+
+    <!-- Informations générales -->
+    <div class="row g-4">
+      <!-- Informations personnelles -->
+      <div class="col-md-6">
+        <div class="card shadow-sm border-0 rounded-3 mb-4">
+          <div class="card-header bg-primary text-white fw-semibold">
+            <i class="fas fa-user-injured me-2"></i>{% trans "Informations Personnelles" %}
+          </div>
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item d-flex justify-content-between">
+                <strong>Date de naissance</strong> {{ patient.date_naissance|date:"d/m/Y" }}
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <strong>Âge</strong> {{ patient.age }} ans
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <strong>Téléphone</strong>
+                <a href="tel:{{ patient.telephone }}" class="text-decoration-none">
+                  {{ patient.telephone }}
+                </a>
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <strong>Email</strong>
+                {% if patient.email %}
+                  <a href="mailto:{{ patient.email }}">{{ patient.email }}</a>
+                {% else %}
+                  —
+                {% endif %}
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <strong>Adresse</strong>
+                {{ patient.adresse|default:"—" }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Données médicales -->
+      <div class="col-md-6">
+        <div class="card shadow-sm border-0 rounded-3 mb-4">
+          <div class="card-header bg-primary text-white fw-semibold">
+            <i class="fas fa-heartbeat me-2"></i>{% trans "Données Médicales" %}
+          </div>
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item d-flex justify-content-between">
+                <strong>Groupe sanguin</strong>
+                {{ patient.groupe_sanguin }}
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <strong>Poids</strong>
+                {% if patient.poids %}
+                  {{ patient.poids }} kg
+                {% else %}
+                  —
+                {% endif %}
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <strong>Taille</strong>
+                {% if patient.taille %}
+                  {{ patient.taille }} cm
+                {% else %}
+                  —
+                {% endif %}
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <strong>Tension artérielle</strong>
+                {{ patient.tension_artérielle|default:"—" }}
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <strong>Allergies</strong>
+                {{ patient.allergies|default:"—" }}
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <strong>Antécédents médicaux</strong>
+                {{ patient.antecedents_medicaux|default:"—" }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historique des consultations -->
+    {% if consultations %}
+    <div class="card shadow-sm border-0 rounded-3 mb-4">
+      <div class="card-header bg-light fw-semibold">
+        <i class="fas fa-notes-medical me-2"></i>Historique des consultations
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Type</th>
+              <th>Médecin</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for consultation in consultations %}
+            <tr>
+              <td>{{ consultation.type_consultation }}</td>
+              <td>{{ consultation.medecin }}</td>
+              <td>{{ consultation.date_consultation|date:"d/m/Y H:i" }}</td>
+              <td>
+                <span class="badge text-success bg-{{ consultation.get_status_badge }}">
+                  {{ consultation.status }}
+                </span>
+              </td>
+              <td>
+                <a href="{% url 'consultation_detail' consultation.id %}" class="btn btn-sm btn-outline-primary">
+                  Voir
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info mb-4">Aucune consultation trouvée.</div>
+    {% endif %}
+
+    <!-- Ordonnances -->
+    {% if ordonnances %}
+    <div class="card shadow-sm border-0 rounded-3 mb-4">
+      <div class="card-header bg-light fw-semibold">
+        <i class="fas fa-pills me-2"></i>{% trans "Ordonnances" %}
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Médicament</th>
+              <th>Médecin</th>
+              <th>Date</th>
+              <th>Durée</th>
+              <th>Quantité</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ordonnance in ordonnances %}
+            <tr>
+              <td>{{ ordonnance.nom_medicament }}</td>
+              <td>{{ ordonnance.consultation.medecin }}</td>
+              <td>{{ ordonnance.date_prescription|date:"d/m/Y" }}</td>
+              <td>{{ ordonnance.duree }}</td>
+              <td>{{ ordonnance.quantite }}</td>
+              <td>
+                <a href="{% url 'detail_ordonnance' ordonnance.id %}" class="btn btn-sm btn-success">
+                  <i class="fas fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% else %}
+    <div class="alert alert-warning mb-4">Aucune ordonnance trouvée.</div>
+    {% endif %}
+
+    <!-- Examens -->
+    {% if examens %}
+    <div class="card shadow-sm border-0 rounded-3 mb-4">
+      <div class="card-header bg-light fw-semibold">
+        <i class="fas fa-vials me-2"></i>{% trans "Examens" %}
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Nom</th>
+              <th>Médecin</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Résultat</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for examen in examens %}
+            <tr>
+              <td>{{ examen.nom }}</td>
+              <td>{{ examen.consultation.medecin }}</td>
+              <td>{{ examen.date_examen|default:"—" }}</td>
+              <td>
+                <span class="badge bg-{{ examen.statut|lower }}">
+                  {{ examen.get_statut_display }}
+                </span>
+              </td>
+              <td>{{ examen.resultat|default:"—" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info mb-4">Aucun examen trouvé.</div>
+    {% endif %}
+
+    <!-- Paiements -->
+    
+
+    <a href="{% url 'enregistrer_paiement_consultation' patient.id  %}" class="btn btn-sm btn-success">
+                  <i class="fas fa-add "></i>
+                </a>
+    {% if paiements %}
+    <div class="card shadow-sm border-0 rounded-3 mb-4">
+      <div class="card-header bg-light fw-semibold">
+        <i class="fas fa-receipt me-2"></i>{% trans "Paiements" %}
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Type</th>
+              <th>Médecin</th>
+              <th>Date</th>
+              <th>Montant payé</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for paiement in paiements %}
+            <tr>
+              <td>{{ paiement.consultation.type_consultation }}</td>
+              <td>{{ paiement.consultation.medecin }}</td>
+              <td>{{ paiement.date_paiement|date:"d/m/Y" }}</td>
+              <td>{{ paiement.montant_paye }} XAF</td>
+              <td>
+                <span class="badge text-success bg-{{ paiement.get_status_display|lower }}">
+                  {{ paiement.get_status_display }}
+                </span>
+              </td>
+              <td>
+                <a href="{% url 'liste_paiements'  %}" class="btn btn-sm btn-success">
+                  <i class="fas fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info mb-4">Aucun paiement enregistré.</div>
+    {% endif %}
+
+    <!-- Bouton retour -->
+    <div class="mt-3 text-end">
+      <a href="{% url 'liste_patients' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i> Retour
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

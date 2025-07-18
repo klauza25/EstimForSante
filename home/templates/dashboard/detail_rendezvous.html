@@ -1,0 +1,21 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Rendez-vous Details{% endblock %}
+
+{% block content %}
+<div class="container pt-5 mt-5">
+    <h1>Rendez-vous Details</h1>
+
+    <p><strong>Patient:</strong> {{ rendezvous.patient }}</p>
+    <p><strong>Doctor:</strong> {{ rendezvous.medecin }}</p>
+    <p><strong>Date:</strong> {{ rendezvous.date_rendezvous }}</p>
+    <p><strong>Start Time:</strong> {{ rendezvous.heure_debut }}</p>
+    <p><strong>End Time:</strong> {{ rendezvous.heure_fin }}</p>
+    <p><strong>Reason:</strong> {{ rendezvous.motif|default:"N/A" }}</p>
+    <p><strong>Status:</strong> {{ rendezvous.status }}</p>
+
+    <p><a href="{% url 'create_rendezvous' rendezvous.patient.id %}" class="btn btn-primary">Create New Rendez-vous for this Patient</a></p>
+    <p><a href="" class="btn btn-secondary">Back to Rendez-vous List</a></p>
+</div>
+{% endblock %}

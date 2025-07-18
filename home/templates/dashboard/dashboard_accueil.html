@@ -1,0 +1,190 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+{% block title %}
+  {% trans "Accueil" %} Dashboard
+{% endblock %}
+{% load static %}
+
+{% block content %}
+<style>
+body {
+  background: linear-gradient(120deg, #f0f4f8 0%, #e2eafc 100%);
+  min-height: 100vh;
+}
+.card.card-stats {
+  border-radius: 1rem;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(3px);
+  box-shadow: 0 4px 16px rgba(80, 112, 255, 0.10);
+  border: 1px solid #e0e7ef;
+  transition: transform .18s, box-shadow .18s, background .18s;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp .6s forwards;
+  padding: 0.7rem 0.5rem;
+}
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.card.card-stats:hover {
+  transform: scale(1.03) translateY(-2px);
+  box-shadow: 0 8px 24px rgba(80, 112, 255, 0.13);
+  background: rgba(255,255,255,0.97);
+}
+.icon-big {
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1 0%, #a5b4fc 100%);
+  color: #fff !important;
+  padding: 12px;
+  font-size: 1.5rem;
+  box-shadow: 0 1px 6px rgba(99,102,241,0.10);
+  margin-bottom: 0.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-success { background: linear-gradient(135deg, #22d3ee 0%, #818cf8 100%) !important; }
+.icon-primary { background: linear-gradient(135deg, #f472b6 0%, #6366f1 100%) !important; }
+.icon-info    { background: linear-gradient(135deg, #38bdf8 0%, #6366f1 100%) !important; }
+.icon-secondary { background: linear-gradient(135deg, #a3e635 0%, #6366f1 100%) !important; }
+.numbers h4.card-title {
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-bottom: 0;
+  display: inline-block;
+  background: #f1f5ff;
+  color: #3730a3;
+  border-radius: 0.4rem;
+  padding: 0.15em 0.6em;
+  box-shadow: 0 1px 2px rgba(80,112,255,0.04);
+}
+.numbers p.card-category {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+@media (max-width: 767px) {
+  .card.card-stats {
+    margin-bottom: 1.2rem;
+    padding: 0.6rem 0.3rem;
+  }
+  .icon-big {
+    font-size: 1.1rem;
+    padding: 8px;
+  }
+  .numbers h4.card-title {
+    font-size: 1rem;
+    padding: 0.12em 0.4em;
+  }
+}
+</style>
+<div class="container py-4">
+  <div class="page-inner">
+    <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
+      <h1 class="fw-bold">Bienvenue {{ user }} !</h1>
+      <p class="ms-3 text-muted">Ceci est votre tableau de bord.</p>
+    </div>
+
+    <div class="row g-4">
+      <!-- Carte Pointage Présence -->
+      <div class="col-sm-6 col-md-3">
+        <a href="{% url 'pointage_presence' %}" class="text-decoration-none">
+          <div class="card card-stats card-round shadow-lg border-0 hover-shadow-lg transition-all" style="transition: transform .2s;">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-icon">
+                  <div class="icon-big text-center icon-success bubble-shadow-small">
+                    <i class="fas fa-fingerprint fa-2x"></i>
+                  </div>
+                </div>
+                <div class="col col-stats ms-3 ms-sm-0">
+                  <div class="numbers">
+                    <p class="card-category mb-1">Présent actuel</p>
+                    <h4 class="card-title">Pointage</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Carte Liste des Patients -->
+      <div class="col-sm-6 col-md-3">
+        <a href="{% url 'liste_patients' %}" class="text-decoration-none">
+          <div class="card card-stats card-round shadow-lg border-0 hover-shadow-lg transition-all" style="transition: transform .2s;">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-icon">
+                  <div class="icon-big text-center icon-primary bubble-shadow-small">
+                    <i class="fas fa-heartbeat fa-2x"></i>
+                  </div>
+                </div>
+                <div class="col col-stats ms-3 ms-sm-0">
+                  <div class="numbers">
+                    <p class="card-category mb-1">Patients</p>
+                    <h4 class="card-title">{{ patients.count }}</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Carte Consultations (assignées) -->
+      <div class="col-sm-6 col-md-3">
+        <a href="{% url 'assignation_consultation' %}" class="text-decoration-none">
+          <div class="card card-stats card-round shadow-lg border-0 hover-shadow-lg transition-all" style="transition: transform .2s;">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-icon">
+                  <div class="icon-big text-center icon-info bubble-shadow-small">
+                    <i class="fas fa-user-md fa-2x"></i>
+                  </div>
+                </div>
+                <div class="col col-stats ms-3 ms-sm-0">
+                  <div class="numbers">
+                    <p class="card-category mb-1">Consultations assignées</p>
+                    <h4 class="card-title">{{ consultations.count }}</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      
+
+      <!-- Carte Personnel -->
+      <div class="col-sm-6 col-md-3">
+        <a href="{% url 'liste_personnel' %}" class="text-decoration-none">
+          <div class="card card-stats card-round shadow-lg border-0 hover-shadow-lg transition-all" style="transition: transform .2s;">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-icon">
+                  <div class="icon-big text-center icon-secondary bubble-shadow-small">
+                    <i class="fas fa-users fa-2x"></i>
+                  </div>
+                </div>
+                <div class="col col-stats ms-3 ms-sm-0">
+                  <div class="numbers">
+                    <p class="card-category mb-1">Personnel total</p>
+                    <h4 class="card-title">{{ personnels.count }}</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

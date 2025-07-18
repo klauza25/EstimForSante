@@ -1,0 +1,282 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Historique Complet de la Clinique{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <!-- Boutons d'action -->
+  <div class="d-flex justify-content-end gap-2 no-print mb-4">
+    <button onclick="window.print()" class="btn btn-outline-primary">
+      <i class="fas fa-print me-1"></i> Imprimer en PDF
+    </button>
+    <button onclick="event.preventDefault(); exportTableToExcel('historique-export')" class="btn btn-outline-success">
+      <i class="fas fa-file-excel me-1"></i> Exporter en Excel
+    </button>
+  </div>
+
+  <!-- Titre principal -->
+  <h2 class="fw-bold text-center mb-5">Historique Complet de la Clinique</h2>
+
+  <!-- Section Patients -->
+  <div class="card shadow-sm mb-5">
+    <div class="card-header bg-primary text-white d-flex align-items-center">
+      <i class="fas fa-user-injured me-2 fs-5"></i>
+      <h5 class="mb-0">Patients</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Nom</th>
+              <th>Prénom</th>
+              <th>Date de naissance</th>
+              <th>Email</th>
+              <th>Téléphone</th>
+              <th>Sexe</th>
+              <th>Détail</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for patient in patients %}
+            <tr>
+              <td>{{ patient.nom }}</td>
+              <td>{{ patient.prenom }}</td>
+              <td>{{ patient.date_naissance|date:"d/m/Y" }}</td>
+              <td>{{ patient.email }}</td>
+              <td>{{ patient.telephone }}</td>
+              <td>{{ patient.sexe }}</td>
+              <td>
+                <a href="{% url 'patient_detail' patient.id %}" class="btn btn-sm btn-info" title="Voir détails">
+                  <i class="fas fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Consultations -->
+  <div class="card shadow-sm mb-5">
+    <div class="card-header bg-primary text-white d-flex align-items-center">
+      <i class="fas fa-stethoscope me-2 fs-5"></i>
+      <h5 class="mb-0">Consultations</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Patient</th>
+              <th>Médecin</th>
+              <th>Date</th>
+              <th>Motif</th>
+              <th>Statut</th>
+              <th>Détail</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for consultation in consultations %}
+            <tr>
+              <td>{{ consultation.patient }}</td>
+              <td>{{ consultation.medecin }}</td>
+              <td>{{ consultation.date_consultation|date:"d/m/Y H:i" }}</td>
+              <td>{{ consultation.motif }}</td>
+              <td><span class="badge bg-info">{{ consultation.get_status_display }}</span></td>
+              <td>
+                <a href="{% url 'consultation_detail' consultation.id %}" class="btn btn-sm btn-info me-1" title="Voir détails">
+                  <i class="fas fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Ordonnances -->
+  <div class="card shadow-sm mb-5">
+    <div class="card-header bg-primary text-white d-flex align-items-center">
+      <i class="fas fa-prescription me-2 fs-5"></i>
+      <h5 class="mb-0">Ordonnances</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Consultation</th>
+              <th>Patient</th>
+              <th>Médicament</th>
+              <th>Quantité</th>
+              <th>Détail</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for ordonnance in ordonnances %}
+    <tr>
+      <td>{{ ordonnance.consultation.id }}</td>
+      <td>{{ ordonnance.patient }}</td>
+      <td>{{ ordonnance.nom_medicament }}</td>
+      <td>{{ ordonnance.quantite }}</td>
+      <td>
+                {% comment %} <a href="{% url 'liste_ordonnances' ordonnance.id %}" class="btn btn-sm btn-info" title="Voir détails"> {% endcomment %}
+                  <i class="fas fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Personnels -->
+  <div class="card shadow-sm mb-5">
+    <div class="card-header bg-primary text-white d-flex align-items-center">
+      <i class="fas fa-users me-2 fs-5"></i>
+      <h5 class="mb-0">Personnels</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Nom</th>
+              <th>Prénom</th>
+              <th>Rôle</th>
+              <th>Email</th>
+              <th>Téléphone</th>
+              <th>Détail</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for personnel in personnels %}
+            <tr>
+              <td>{{ personnel.nom }}</td>
+              <td>{{ personnel.prenom }}</td>
+              <td>{{ personnel.role }}</td>
+              <td>{{ personnel.email }}</td>
+              <td>{{ personnel.telephone }}</td>
+              <td>
+                <a href="{% url 'personnel_detail' personnel.id %}" class="btn btn-sm btn-info" title="Voir détails">
+                  <i class="fas fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Examens -->
+  <div class="card shadow-sm mb-5">
+    <div class="card-header bg-primary text-white d-flex align-items-center">
+      <i class="fas fa-vials me-2 fs-5"></i>
+      <h5 class="mb-0">Examens</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Consultation</th>
+              <th>Type</th>
+              <th>Date</th>
+              <th>Statut</th>
+              <th>Résultat</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for examen in examens %}
+            <tr>
+              <td>{{ examen.consultation }}</td>
+              <td>{{ examen.nom }}</td>
+              <td>{{ examen.consultation.date_consultation|date:"d/m/Y H:i" }}</td>
+              <td><span class="badge bg-warning">{{ examen.get_statut_display }}</span></td>
+              <td>{{ examen.resultat|default:"-" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+
+  </div>
+
+  <!-- Section Rendez-vous -->
+  <div class="card shadow-sm mb-5">
+    <div class="card-header bg-primary text-white d-flex align-items-center">
+      <i class="fas fa-calendar-alt me-2 fs-5"></i>
+      <h5 class="mb-0">Rendez-vous</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Patient</th>
+              <th>Médecin</th>
+              <th>Date et Heure</th>
+              <th>Motif</th>
+              <th>Statut</th>
+              <th>Détail</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for rendezvous in rendezvous_list %}
+            <tr>
+              <td>{{ rendezvous.patient }}</td>
+              <td>{{ rendezvous.medecin }}</td>
+              <td>{{ rendezvous.date_heure|date:"d/m/Y H:i" }}</td>
+              <td>{{ rendezvous.motif }}</td>
+              <td><span class="badge bg-{{ rendezvous.get_status_color }}">{{ rendezvous.get_status_display }}</span></td>
+              <td>
+                <a href="{% url 'rendezvous_detail' rendezvous.id %}" class="btn btn-sm btn-info" title="Voir détails">
+                  <i class="fas fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Ordonnances -->
+
+
+
+  <!-- Version cachée pour l'export Excel -->
+  <div id="historique-export" style="display: none;">
+   
+  </div>
+</div>
+
+<!-- Script pour l'export Excel -->
+<script>
+  function exportTableToExcel(tableID, filename = 'historique_clinique') {
+    const container = document.getElementById(tableID);
+    const html = container.innerHTML.replace(/ /g, '%20');
+    const downloadLink = document.createElement("a");
+    downloadLink.href = 'application/vnd.ms-excel,' + html;
+    downloadLink.download = filename + '.xls';
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  }
+</script>
+{% endblock %}

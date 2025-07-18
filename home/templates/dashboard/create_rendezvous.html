@@ -1,0 +1,57 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Créer un rendez-vous{% endblock %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="page-inner">
+    <h3 class="fw-bold mb-4">Planifier un rendez-vous</h3>
+    <p><strong>Patient :</strong> {{ patient.nom }} {{ patient.prenom }}</p>
+
+   
+
+    <form method="post" class="row g-4">
+      {% csrf_token %}
+      
+      <div class="col-md-6">
+        <label for="{{ form.medecin.id_for_label }}" class="form-label">{{ form.medecin.label }}</label>
+        {{ form.medecin }}
+      </div>
+
+      <div class="col-md-6">
+        <label for="{{ form.date_rendezvous.id_for_label }}" class="form-label">{{ form.date_rendezvous.label }}</label>
+        {{ form.date_rendezvous }}
+      </div>
+
+      <div class="col-md-6">
+        <label for="{{ form.heure_debut.id_for_label }}" class="form-label">{{ form.heure_debut.label }}</label>
+        {{ form.heure_debut }}
+      </div>
+
+      <div class="col-md-6">
+        <label for="{{ form.heure_fin.id_for_label }}" class="form-label">{{ form.heure_fin.label }}</label>
+        {{ form.heure_fin }}
+      </div>
+
+      <div class="col-md-12">
+        <label for="{{ form.motif.id_for_label }}" class="form-label">{{ form.motif.label }}</label>
+        {{ form.motif }}
+      </div>
+
+      <div class="col-md-6">
+        <label for="{{ form.status.id_for_label }}" class="form-label">{{ form.status.label }}</label>
+        {{ form.status }}
+      </div>
+
+      <div class="col-12 text-end mt-3">
+        <a href="/" class="btn btn-outline-secondary me-2">
+          Retour
+        </a>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-calendar-check me-1"></i> Créer le rendez-vous
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

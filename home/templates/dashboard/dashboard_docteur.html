@@ -1,0 +1,263 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+<style>
+  #tableContainer {
+    transition: all 0.3s ease;
+  }
+</style>
+{% block content %}
+<div class="container mt-3 pt-3">
+  <div class="page-inner">
+
+    <!-- Titre et actions -->
+    <div class="d-flex align-items-center justify-content-between flex-column flex-md-row pt-2 pb-4">
+      <div>
+        <h3 class="fw-bold mb-3">Bienvenue, Docteur {{ request.user.username }}</h3>
+        <h6 class="op-7 mb-0">Tableau de bord médecin</h6>
+      </div>
+      <div class="ms-md-auto mt-3 mt-md-0">
+        <a href="#" class="btn btn-outline-info btn-round me-2"><i class="fas fa-cog"></i> Paramètres</a>
+        <a href="{% url 'ajouter_patient' %}" class="btn btn-primary btn-round"><i class="fas fa-user-plus"></i> Nouveau patient</a>
+      </div>
+    </div>
+
+    <!-- Cartes récapitulatives -->
+    <div class="row g-3 mb-4">
+      <!-- Pointage -->
+      <div class="col-sm-6 col-md-3" data-aos="fade-up" data-aos-delay="0">
+        <div class="card card-stats card-round shadow-sm">
+          <a href="{% url 'pointage_presence' %}" class="text-decoration-none text-dark">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-icon">
+                  <div class="icon-big text-center icon-primary bubble-shadow-small">
+                    <i class="fas fa-fingerprint"></i>
+                  </div>
+                </div>
+                <div class="col col-stats ms-3 ms-sm-0">
+                  <div class="numbers">
+                    <p class="card-category">Pointage</p>
+                    <h4 class="card-title">Présent</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Présences -->
+      <div class="col-sm-6 col-md-3" data-aos="fade-up" data-aos-delay="100">
+        <div class="card card-stats card-round shadow-sm">
+          <a href="{% url 'liste_presences' %}" class="text-decoration-none text-dark">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-icon">
+                  <div class="icon-big text-center icon-info bubble-shadow-small">
+                    <i class="fas fa-user-check"></i>
+                  </div>
+                </div>
+                <div class="col col-stats ms-3 ms-sm-0">
+                  <div class="numbers">
+                    <p class="card-category">Présences</p>
+                    <h4 class="card-title">Voir</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Consultations -->
+      <div class="col-sm-6 col-md-3" data-aos="fade-up" data-aos-delay="200">
+        <div class="card card-stats card-round shadow-sm">
+          <a href="{% url 'liste_consultations' %}" class="text-decoration-none text-dark">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-icon">
+                  <div class="icon-big text-center icon-success bubble-shadow-small">
+                    <i class="fas fa-user-md"></i>
+                  </div>
+                </div>
+                <div class="col col-stats ms-3 ms-sm-0">
+                  <div class="numbers">
+                    <p class="card-category">Consultations</p>
+                    <h4 class="card-title">{{ consultation.count }}</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Personnel -->
+      <div class="col-sm-6 col-md-3" data-aos="fade-up" data-aos-delay="300">
+        <div class="card card-stats card-round shadow-sm">
+          <a href="{% url 'liste_personnel' %}" class="text-decoration-none text-dark">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-icon">
+                  <div class="icon-big text-center icon-secondary bubble-shadow-small">
+                    <i class="fas fa-users"></i>
+                  </div>
+                </div>
+                <div class="col col-stats ms-3 ms-sm-0">
+                  <div class="numbers">
+                    <p class="card-category">Personnels</p>
+                    <h4 class="card-title">{{ personnel.count }}</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistiques supplémentaires -->
+    <div class="row mt-4 mb-3">
+      <div class="col-md-3" data-aos="fade-up" data-aos-delay="0">
+        <div class="alert alert-info shadow-sm text-center py-3">
+          <div class="fs-2 fw-bold">{{ consultations.count }}</div>
+          <div class="small">Consultations totales</div>
+        </div>
+      </div>
+      <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+        <div class="alert alert-success shadow-sm text-center py-3">
+          <div class="fs-2 fw-bold">{{ patients.count }}</div>
+          <div class="small">Patients suivis</div>
+        </div>
+      </div>
+      <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+        <div class="alert alert-warning shadow-sm text-center py-3">
+          <div class="fs-2 fw-bold">{{ examens.count }}</div>
+          <div class="small">Examens en attente</div>
+        </div>
+      </div>
+      <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+        <div class="alert alert-primary shadow-sm text-center py-3">
+          <div class="fs-2 fw-bold">{{ rendez_vous.count }}</div>
+          <div class="small">Rendez-vous à venir</div>
+        </div>
+      </div>
+    </div>
+
+   <!-- Bouton pour afficher/masquer -->
+<button id="toggleTableBtn" class="btn btn-outline-primary mb-3">
+  <i class="fas fa-eye-slash"></i> Masquer le tableau
+</button>
+
+<!-- Conteneur du tableau -->
+<div id="tableContainer" data-aos="fade-up" data-aos-delay="400">
+  <div class="card shadow-sm border-0 rounded-3">
+    <div class="card-header bg-white py-3">
+      <h5 class="mb-0">Mes Consultations Assignées</h5>
+    </div>
+    <div class="card-body p-0">
+      {% if consultations %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Patient</th>
+              <th>Âge</th>
+              <th>Date</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+          {{ consultation.count }}
+            {% for consultation in consultations %}
+            <tr>
+               
+              <td>{{ forloop.counter }}</td>
+              <td>{{ consultation.patient.nom }} {{ consultation.patient.prenom }}</td>
+              <td>{{ consultation.patient.age }} ans</td>
+              <td>{{ consultation.date_consultation|date:"d/m/Y H:i" }}</td>
+              <td>
+                <span class="badge text-success fs-5 bg-{{ consultation.get_status_badge }}">
+                  {{ consultation.get_status_display }}
+                </span>
+              </td>
+              <td>
+                <a href="{% url 'patient_detail' consultation.patient.id %}" class="btn btn-sm btn-outline-primary me-1">
+                  <i class="fas fa-eye"></i> Voir
+                </a>
+                <a href="{% url 'update_consultation' consultation_id=consultation.id %}" class="btn btn-sm btn-primary">
+                  <i class="fas fa-edit"></i> Consulter
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="text-center py-4 text-muted">
+        Aucune consultation assignée pour le moment.
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const btn = document.getElementById("toggleTableBtn");
+      const container = document.getElementById("tableContainer");
+  
+      // Masquer le tableau dès le chargement de la page
+      container.style.display = "none";
+  
+      btn.addEventListener("click", function () {
+        if (container.style.display === "none") {
+          container.style.display = ""; // Afficher le tableau
+          btn.innerHTML = '<i class="fas fa-eye-slash"></i> Masquer le tableau';
+        } else {
+          container.style.display = "none"; // Cacher le tableau
+          btn.innerHTML = '<i class="fas fa-eye"></i> Afficher le tableau';
+        }
+      });
+    });
+  </script>
+  <!-- Dans le <head> -->
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+<!-- Avant la balise </body> -->
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  AOS.init();
+</script>
+{% if messages %}
+  <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+    {% for message in messages %}
+      <div class="toast align-items-center text-bg-{{ message.tags }} border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+        <div class="d-flex">
+          <div class="toast-body">
+            {{ message }}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+      var toastList = toastElList.map(function (toastEl) {
+        var toast = new bootstrap.Toast(toastEl)
+        toast.show()
+        return toast
+      })
+    });
+  </script>
+{% endif %}
+
+</div>
+{% endblock %}

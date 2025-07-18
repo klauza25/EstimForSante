@@ -1,0 +1,41 @@
+{% block content %}
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    <label for="username">Nom d'utilisateur :</label>
+    <input type="text" name="username" required><br>
+
+    <label for="password">Mot de passe :</label>
+    <input type="password" name="password" required><br>
+
+    <label for="nom">Nom :</label>
+    <input type="text" name="nom" required><br>
+
+    <label for="prenom">Prénom :</label>
+    <input type="text" name="prenom" required><br>
+
+    <label for="role">Rôle :</label>
+    <select name="role" required>
+        {% for role in roles %}
+        <option value="{{ role.0 }}">{{ role.1 }}</option>
+        {% endfor %}
+    </select><br>
+
+    <label for="email">Email :</label>
+    <input type="email" name="email" required><br>
+
+   
+
+    <button type="submit">Créer</button>
+</form>
+
+
+{% endblock %}

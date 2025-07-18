@@ -1,0 +1,27 @@
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>Patient</th>
+      <th>Assigné à</th>
+      <th>Date</th>
+      <th>Statut</th>
+      <th>Motif</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for consultation in consultations %}
+    <tr>
+      <td>{{ consultation.patient.nom }} {{ consultation.patient.prenom }}</td>
+      <td>{{ consultation.assigne_a.nom }} {{ consultation.assigne_a.prenom }} ({{ consultation.assigne_a.role }})</td>
+      <td>{{ consultation.date_consultation|date:"d/m/Y H:i" }}</td>
+      <td>{{ consultation.get_status_display }}</td>
+      <td>{{ consultation.motif }}</td>
+      <td>
+        <a href="{% url 'update_consultation' consultation.id %}" class="btn btn-sm btn-primary">Modifier</a>
+        <a href="{% url 'reassigner_consultation' consultation.id %}" class="btn btn-sm btn-warning">Réassigner</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

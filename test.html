@@ -1,0 +1,164 @@
+<!-- templates/factures/paiement_pdf.html -->
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+{% load static %}
+    <meta charset="UTF-8">
+    <title>Facture de paiement - {{ patient }}</title>
+    <style>
+        body {
+            font-family: DejaVu Sans, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .header-info {
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        .total-row {
+            font-weight: bold;
+            background-color: #e9f5ff;
+        }
+
+        .footer-note {
+            margin-top: 20px;
+            font-style: italic;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo img {
+            max-width: 150px;
+            height: auto;
+        }
+
+        .signature {
+            margin-top: 40px;
+            text-align: right;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Logo -->
+    <div class="logo">
+        <img src="{{ request.scheme }}://{{ request.get_host }}{% static 'assets/img/esante.png' %}" alt="Logo de la clinique">
+    </div>
+
+    <!-- Titre -->
+    <h1>Facture de Paiement</h1>
+
+    <!-- Informations générales -->
+    <div class="header-info">
+        <p><strong>Patient :</strong> {{ patient }}</p>
+        <p><strong>Médecin traitant :</strong> Dr. {{ consultation.medecin.nom }} {{ consultation.medecin.prenom }}</p>
+        <p><strong>Date du paiement :</strong> {{ paiement.date_paiement|date:"d/m/Y H:i" }}</p>
+        <p><strong>Référence paiement :</strong> #PMT-{{ paiement.id }}</p>
+    </div>
+
+    <!-- Tableau des détails -->
+    <table>
+        <thead>
+            <tr>
+                <th>Détail</th>
+                <th>Montant</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Montant total dû</td>
+                <td>{{ paiement.montant_total }} XAF</td>
+            </tr>
+            <tr>
+                <td>Montant payé</td>
+                <td>{{ paiement.montant_paye }} XAF</td>
+            </tr>
+            <tr>
+                <td>Différence rendue</td>
+                <td class="text-success">{{ paiement.difference_rendue }} XAF</td>
+            </tr>
+            <tr>
+                <td>Type de paiement</td>
+                <td>{{ paiement.get_type_paiement_display }}</td>
+            </tr>
+            <tr>
+                <td>Statut du paiement</td>
+                <td>{{ paiement.get_status_display }}</td>
+            </tr>
+            {% if paiement.numero_transaction %}
+            <tr>
+                <td>Numéro de transaction</td>
+                <td>{{ paiement.numero_transaction }}</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+    <!-- Notes -->
+    {% if paiement.notes %}
+    <div class="footer-note">
+        <strong>Note :</strong> {{ paiement.notes }}
+    </div>
+    {% endif %}
+
+    <!-- Signature -->
+    <div class="signature">
+        <p>Fait à Yaoundé, le {{ paiement.date_paiement|date:"d/m/Y" }}</p>
+        <p><strong>{{ paiement.utilisateur }}</strong></p>
+        <p>Signature électronique</p>
+    </div>
+
+</div>
+
+</body>
+</html>

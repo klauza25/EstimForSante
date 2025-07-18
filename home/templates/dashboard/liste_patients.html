@@ -1,0 +1,315 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Liste des Patients" %}{% endblock %}
+
+{% block content %}
+<style>
+  .hover-shadow:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+  }
+
+  .badge-role {
+    font-size: 0.8em;
+    padding: 0.4em 0.6em;
+    border-radius: 0.25rem;
+  }
+
+  .action-btns .btn {
+    margin: 0 4px;
+    font-size: 0.9em;
+  }
+
+  .search-box {
+    max-width: 400px;
+    margin: auto;
+  }
+
+  .card-count {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
+  .btn-circle {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1.1rem;
+  }
+</style>
+
+<div class="container mt-5 pt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h2 class="fw-bold text-center w-100">{% trans "Liste des Patients" %}</h2>
+
+    <!-- Bouton Ajouter un patient -->
+    {% if request.user.role in 'accueil,medecin' %}
+      <a href="{% url 'ajouter_patient' %}" class="btn btn-success rounded-pill shadow-sm hover-shadow">
+        <i class="fas fa-user-injured me-2"></i>{% trans "Ajouter un patient" %}
+      </a>
+    {% endif %}
+  </div>
+
+  <!-- Barre de recherche -->
+  <div class="d-flex justify-content-center mb-4">
+    <div class="input-group search-box">
+      <span class="input-group-text">
+        <i class="fas fa-search"></i>
+      </span>
+      <input type="text" class="form-control" id="searchInput" placeholder="Rechercher un patient..." value="{{ query }}">
+    </div>
+  </div>
+
+  <!-- Statistiques -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card card-stats card-round shadow-sm hover-shadow">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="icon-big text-center icon-primary bubble-shadow-small me-3">
+              <i class="fas fa-users fa-2x"></i>
+            </div>
+            <div>
+              <p class="card-category">Total</p>
+              <h4 class="card-title card-count">{{ total_patients }}</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card card-stats card-round shadow-sm hover-shadow">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="icon-big text-center icon-info bubble-shadow-small me-3">
+              <i class="fas fa-male fa-2x"></i>
+            </div>
+            <div>
+              <p class="card-category">Hommes</p>
+              <h4 class="card-title card-count">{{ hommes }}</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card card-stats card-round shadow-sm hover-shadow">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="icon-big text-center icon-danger bubble-shadow-small me-3">
+              <i class="fas fa-female fa-2x"></i>
+            </div>
+            <div>
+              <p class="card-category">Femmes</p>
+              <h4 class="card-title card-count">{{ femmes }}</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card card-stats card-round shadow-sm hover-shadow">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="icon-big text-center icon-success bubble-shadow-small me-3">
+              <i class="fas fa-calendar-check fa-2x"></i>
+            </div>
+            <div>
+              <p class="card-category">Consultations</p>
+              <h4 class="card-title card-count">{{ consultations_count }}</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tableau des patients -->
+  <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Patients enregistrés</h5>
+      <div class="d-flex gap-2">
+        <button class="btn btn-sm btn-outline-primary" onclick="window.print()">
+          <i class="fas fa-print"></i>
+        </button>
+        <button class="btn btn-sm btn-outline-secondary" onclick="exportToCSV()">
+          <i class="fas fa-file-csv"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 text-center" id="patientsTable">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Nom & Prénom</th>
+              <th>Sexe</th>
+              <th>Téléphone</th>
+              <th>Email</th>
+              <th>Âge</th>
+              {% if request.user.role in 'accueil,medecin' %}
+              <th>{% trans "Actions" %}</th>
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for patient in patients %}
+            <tr class="hover-shadow">
+              <td>{{ forloop.counter }}</td>
+              <td class="text-start">
+                <div class="d-flex align-items-center">
+                  <div class="me-3">
+                    <img src="{% static 'assets/img/profile2.jpg' %}" width="35" height="35" class="rounded-circle" alt="Photo">
+                  </div>
+                  <div>
+                    <strong>{{ patient.nom }} {{ patient.prenom }}</strong><br/>
+                    <small class="text-muted">ID: {{ patient.id }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>
+                {% if patient.sexe == 'Homme' %}
+                <i class="fas fa-male text-primary me-1"></i>
+                {% elif patient.sexe == 'Femme' %}
+                <i class="fas fa-female text-danger me-1"></i>
+                {% else %}
+                <i class="fas fa-user text-muted me-1"></i>
+                {% endif %}
+                {{ patient.get_sexe_display|default:"—" }}
+              </td>
+              <td>
+                <a href="tel:{{ patient.telephone }}" class="text-decoration-none">
+                  {{ patient.telephone }}
+                </a><br/>
+                <a href="https://wa.me/ {{ patient.telephone }}" target="_blank" class="text-success small">
+                  <i class="fab fa-whatsapp me-1"></i> Envoyer un message
+                </a>
+              </td>
+              <td>
+                {% if patient.email %}
+                <a href="mailto:{{ patient.email }}">{{ patient.email }}</a>
+                {% else %}
+                —
+                {% endif %}
+              </td>
+              <td>{{ patient.age }} ans</td>
+
+              <!-- Actions -->
+              {% if request.user.role in 'accueil,medecin' %}
+              <td class="text-end action-btns">
+                <a href="{% url 'modifier_patient' patient.id %}" class="btn btn-sm btn-warning" title="Modifier">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a href="{% url 'patient_detail' patient.id %}" class="btn btn-sm btn-success" title="Détail">
+                  <i class="fas fa-eye"></i>
+                </a>
+                <button type="button" class="btn btn-sm btn-danger" title="Supprimer"
+                        onclick="if (confirm('Êtes-vous sûr de vouloir supprimer ce patient ?')) window.location.href='{% url 'supprimer_patient' patient.id %}'">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+              {% endif %}
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="{% if request.user.role in 'accueil,medecin' %}7{% else %}6{% endif %}">
+                <div class="alert alert-info m-0 rounded-3 text-center">
+                  <i class="fas fa-users-slash fa-2x text-secondary mb-2"></i><br/>
+                  {% trans "Aucun patient trouvé." %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  {% if patients.paginator.num_pages > 1 %}
+  <nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% if patients.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ patients.previous_page_number }}">Précédent</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <a class="page-link" href="#">Précédent</a>
+        </li>
+      {% endif %}
+
+      {% for num in patients.paginator.page_range %}
+        <li class="page-item {% if patients.number == num %}active{% endif %}">
+          <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        </li>
+      {% endfor %}
+
+      {% if patients.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ patients.next_page_number }}">Suivant</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <a class="page-link" href="#">Suivant</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+
+<!-- Scripts -->
+<script>
+  // Recherche dynamique
+  document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchInput');
+    const table = document.getElementById('patientsTable');
+    const rows = table ? table.getElementsByTagName('tr') : [];
+
+    if (searchInput && table) {
+      searchInput.addEventListener('input', function () {
+        const filter = searchInput.value.toLowerCase().trim();
+        for (let row of rows) {
+          const text = row.textContent.toLowerCase();
+          row.style.display = text.includes(filter) ? '' : 'none';
+        }
+      });
+    }
+  });
+
+  // Export CSV
+  function exportToCSV() {
+    const table = document.getElementById("patientsTable");
+    let csv = [];
+
+    for (let row of table.rows) {
+      let cols = [];
+      for (let cell of row.cells) {
+        cols.push(cell.innerText.trim());
+      }
+      csv.push(cols.join(","));
+    }
+
+    const csvString = csv.join("\n");
+    const blob = new Blob([csvString], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "patients.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+</script>
+{% endblock %}

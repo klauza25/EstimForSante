@@ -1,0 +1,177 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Détails de l'Ordonnance #{{ ordonnance.id }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="card shadow-sm border-0 rounded-3">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-4">
+      <div>
+        <h2 class="mb-0">Ordonnance #{{ ordonnance.id }}</h2>
+        <p class="mb-0 small">Émise le {{ ordonnance.date_prescription|date:"d/m/Y H:i" }}</p>
+      </div>
+      <button onclick="window.print()" class="btn btn-light">
+        <i class="fas fa-print"></i> Imprimer
+      </button>    </div>
+
+    <div class="card-body p-4">
+      <!-- Informations générales -->
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <div class="d-flex align-items-center mb-3">
+            <i class="fas fa-user-circle fs-4 text-primary me-3"></i>
+            <div>
+              <strong>Patient</strong><br>
+              {{ patient.nom }} {{ patient.prenom }}
+            </div>          </div>
+
+          <div class="d-flex align-items-center mb-3">
+            <i class="fas fa-user-md fs-4 text-primary me-3"></i>
+            <div>
+              <strong>Médecin prescripteur</strong><br>
+              {{ ordonnance.consultation.medecin.nom }} {{ ordonnance.consultation.medecin.prenom }}
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card h-100 bg-light">
+            <div class="card-body">
+              <h5 class="card-title"><i class="fas fa-prescription-bottle-alt text-primary me-2"></i>Médicament prescrit</h5>
+              <h6 class="mb-2">{{ ordonnance.nom_medicament }}</h6>
+              <p class="mb-1"><strong>Quantité :</strong> {{ ordonnance.quantite }}</p>
+              <p class="mb-1"><strong>Durée :</strong> {{ ordonnance.duree }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Informations FDA -->
+      {% if ordonnance.fda_info %}
+      <div class="row mt-4">
+        <div class="col-12">
+          <div class="card border-info">
+            <div class="card-header bg-info text-white">
+              <h5 class="mb-0">
+                <i class="fas fa-info-circle me-2"></i>
+                Informations FDA sur {{ ordonnance.nom_medicament }}
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                {% if ordonnance.fda_info.generic_name %}
+                <div class="col-md-6 mb-3">
+                  <h6 class="text-primary">Nom générique :</h6>
+                  <p>{{ ordonnance.fda_info.generic_name }}</p>
+                </div>
+                {% endif %}
+
+                {% if ordonnance.fda_info.indications %}
+                <div class="col-12 mb-3">
+                  <h6 class="text-primary">Indications :</h6>
+                  <p>{{ ordonnance.fda_info.indications }}</p>
+                </div>
+                {% endif %}
+
+                {% if ordonnance.fda_info.dosage %}
+                <div class="col-12 mb-3">
+                  <h6 class="text-primary">Posologie recommandée :</h6>
+                  <div class="alert alert-info">
+                    {{ ordonnance.fda_info.dosage }}
+                  </div>
+                </div>
+                {% endif %}
+
+                {% if ordonnance.fda_info.warnings %}
+                <div class="col-12 mb-3">
+                  <h6 class="text-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Avertissements :
+                  </h6>
+                  <div class="alert alert-warning">
+                    {{ ordonnance.fda_info.warnings }}
+                  </div>
+                </div>
+                {% endif %}
+
+                {% if ordonnance.fda_info.side_effects %}
+                <div class="col-12">
+                  <h6 class="text-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>Effets secondaires possibles :
+                  </h6>
+                  <div class="alert alert-danger">
+                    {{ ordonnance.fda_info.side_effects }}
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Instructions et notes -->
+      <div class="row mt-4">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">Instructions de prise</h5>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <h6>Posologie :</h6>
+                <p>{{ ordonnance.posologie }}</p>
+              </div>
+              {% if ordonnance.notes %}
+              <div>
+                <h6>Notes supplémentaires :</h6>
+                <p>{{ ordonnance.notes }}</p>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Boutons d'action -->
+      <div class="mt-4 d-flex justify-content-between">
+        <a href="{% url 'ordonnances_patient' patient_id=patient.id %}" class="btn btn-outline-secondary">
+          <!-- {% url 'liste_ordonnances'  %} -->
+          <i class="fas fa-arrow-left me-2"></i>Retour aux ordonnances
+        </a>
+        <div>
+          <button onclick="window.print()" class="btn btn-primary">
+            <i class="fas fa-print me-2"></i>Imprimer l'ordonnance
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Style pour l'impression -->
+<style media="print">
+  @page {
+    size: A4;
+    margin: 2cm;
+  }
+  .btn, .no-print {
+    display: none !important;
+  }
+  .card {
+    border: none !important;
+    box-shadow: none !important;
+  }
+  .card-header {
+    background-color: white !important;
+    color: black !important;
+  }
+  .alert {
+    border: 1px solid #ddd !important;
+    background-color: white !important;
+    color: black !important;
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Assignation Consultation{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-inner">
+    <h3 class="fw-bold mb-3">Reassignation de Consultation</h3>
+    <<form method="POST">
+        {% csrf_token %}
+        <h3>Réassigner la Consultation</h3>
+        <p>Patient : {{ consultation.patient.nom }} {{ consultation.patient.prenom }}</p>
+        <label for="infirmier">Sélectionnez un infirmier :</label>
+        <select name="infirmier" id="infirmier" class="form-select" required>
+          <option value="">Sélectionnez un infirmier</option>
+          {% for infirmier in infirmiers %}
+          <option value="{{ infirmier.id }}">{{ infirmier.nom }} {{ infirmier.prenom }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary mt-3">Réassigner</button>
+      </form>
+  </div>
+</div>
+{% endblock %}

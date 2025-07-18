@@ -1,0 +1,46 @@
+<!-- dashboard/modifier_patient.html -->
+
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+{% block title %}Modifier un patient{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-primary text-white py-3 d-flex align-items-center justify-content-between">
+          <h4 class="mb-0">Modifier les informations du patient</h4>
+          <i class="fas fa-user-edit fs-4"></i>
+        </div>
+
+        <div class="card-body p-4">
+          <!-- Informations -->
+          <div class="alert alert-info mb-4">
+            <strong>Nom du patient :</strong> {{ patient.nom }} {{ patient.prenom }}<br/>
+            <strong>Date d'inscription :</strong> {{ patient.date_inscription|date:"d/m/Y" }}
+          </div>
+
+          <!-- Formulaire -->
+          <form method="post" novalidate>
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-success">
+                <i class="fas fa-save me-1"></i> Enregistrer les modifications
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Retour -->
+        <div class="card-footer text-end">
+          <a href="{% url 'liste_patients' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

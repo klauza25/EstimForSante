@@ -1,0 +1,52 @@
+<!-- dashboard/mes_consultations.html -->
+
+{% extends 'dashboard/base.html' %}
+{% block title %}Mes consultations{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+  <h3>Mes consultations</h3>
+  <p>Dr. {{ request.user.personnel.nom }} {{ request.user.personnel.prenom }}</p>
+
+  {% if consultations %}
+  <div class="table-responsive shadow-sm rounded-3 overflow-hidden">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Patient</th>
+          <th>Date</th>
+          <th>Motif</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for consultation in consultations %}
+        <tr>
+          <td>{{ consultation.patient.nom }} {{ consultation.patient.prenom }}</td>
+          <td>{{ consultation.date_consultation|date:"d/m/Y H:i" }}</td>
+          <td>{{ consultation.motif }}</td>
+          <td>
+            <span class="badge bg-{{ consultation.status|lower }}">
+              {{ consultation.get_status_display }}
+            </span>
+          </td>
+          <td>
+            <a href="{% url 'consultation_detail' consultation.id %}" class="btn btn-sm btn-outline-primary">
+              <i class="fas fa-eye"></i> Détail
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" class="text-center py-4 text-muted">Aucune consultation trouvée.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="alert alert-info mt-4">Aucune consultation trouvée.</div>
+  {% endif %}
+</div>
+{% endblock %}

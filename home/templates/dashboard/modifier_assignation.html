@@ -1,0 +1,41 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Modifier l'assignation{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-primary text-white py-3">
+          <h4 class="mb-0">Modifier l'assignation</h4>
+        </div>
+        <div class="card-body p-4">
+          <!-- Informations -->
+          <div class="alert alert-info mb-4">
+            <strong>Patient actuel :</strong> {{ consultation.patient }}<br/>
+            <strong>Médecin assigné :</strong> {{ consultation.medecin }}
+          </div>
+
+          <!-- Formulaire -->
+          <form method="post" novalidate>
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-success">
+                <i class="fas fa-save me-1"></i> Enregistrer les modifications
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Retour -->
+        <div class="card-footer text-end">
+          <a href="{% url 'assignation_consultation' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Retour à l'assignation
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

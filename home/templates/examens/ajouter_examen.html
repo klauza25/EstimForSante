@@ -1,0 +1,32 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Ajouter un examen{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow border-0 rounded-4 mx-auto" style="max-width: 500px;">
+        <div class="card-header bg-primary text-white text-center">
+            <h4 class="mb-0">Ajouter un examen à la consultation de {{ consultation.patient }}</h4>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'consultation_detail' consultation.id %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Retour
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Ajouter l'examen
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% if user.role in 'medecin infirmier' and consultation.medecin.user == user %}
+    <a href="{% url 'ajouter_examen' consultation.id %}" class="btn btn-warning btn-sm">
+        <i class="fas fa-vials me-2"></i> Ajouter un examen
+    </a>
+{% endif %}
+{% endblock %}

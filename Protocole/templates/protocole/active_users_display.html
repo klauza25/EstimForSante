@@ -1,0 +1,25 @@
+{% block content %}
+<div class="container py-5">
+    <div class="card shadow-sm border-0 rounded-3 mx-auto" style="max-width: 600px;">
+        <div class="card-header bg-primary text-white text-center">
+            <h1 class="mb-0">Utilisateurs Connectés</h1>
+        </div>
+        <div class="card-body">
+            <p class="lead"><strong>Nombre total :</strong> <span class="badge bg-info">{{ count }}</span></p>
+
+            {% if active_users %}
+                <ul class="list-group list-group-flush">
+                    {% for user in active_users %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ user.username }}
+                            <span class="badge bg-success rounded-pill">En ligne</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted text-center my-3">Aucun utilisateur connecté.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

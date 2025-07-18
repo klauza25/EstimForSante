@@ -1,0 +1,56 @@
+<!-- templates/consultations/create_consultation.html -->
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Nouvelle Consultation{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <h3 class="text-center fw-bold mb-4">Nouvelle Consultation</h3>
+          <form method="post" novalidate>
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <!-- Motif -->
+            <div class="mb-3">
+              <label for="{{ form.motif.id_for_label }}" class="form-label">{{ form.motif.label }}</label>
+              {{ form.motif }}
+              <datalist id="motif-list">
+                {% for motif in motif_values %}
+                  <option value="{{ motif }}">{{ motif }}</option>
+                {% endfor %}
+              </datalist>
+              {% if form.motif.errors %}
+                <div class="text-danger small">{{ form.motif.errors|striptags }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Autres champs -->
+            {% for field in form %}
+              {% if field.name != 'motif' %}
+                <div class="mb-3">
+                  <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                  {{ field }}
+                  {% if field.errors %}
+                    <div class="text-danger small">{{ field.errors|striptags }}</div>
+                  {% endif %}
+                </div>
+              {% endif %}
+            {% endfor %}
+
+            <!-- Boutons -->
+            <div class="d-flex justify-content-between mt-4">
+              <button type="submit" class="btn btn-primary">Soumettre</button>
+              <a href="{% url 'liste_consultations' %}" class="btn btn-secondary">Annuler</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Connexion - E-SANTÉ</title>
+  <style>
+    body {
+      min-height: 100vh;
+      background: 
+        url('https://images.pexels.com/photos/5452221/pexels-photo-5452221.jpeg?auto=compress&cs=tinysrgb&w=1200')
+        center/cover no-repeat;
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+  <div class="w-full max-w-md mx-auto bg-white/90 rounded-3xl shadow-2xl p-10 backdrop-blur-md">
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-extrabold text-indigo-800 drop-shadow-lg mb-2">E-SANTÉ</h1>
+      <p class="text-lg text-gray-600 font-light">Connexion à votre espace personnel</p>
+    </div>
+
+    {% if form.errors %}
+      <div class="alert alert-danger">Nom d'utilisateur ou mot de passe incorrect.</div>
+    {% endif %}
+
+    <form method="post" class="space-y-6">
+      {% csrf_token %}
+
+      <!-- Champ Email -->
+      <div>
+        <label for="email" class="block text-gray-700 font-semibold mb-1">Nom d'utilisateur ou email</label>
+        <div class="flex items-center border-2 rounded-xl px-3 py-2 bg-gray-50 focus-within:border-indigo-500 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206
+                     a8.959 8.959 0 01-4.5 1.207" />
+          </svg>
+          <input id="email" class="pl-3 w-full outline-none border-none bg-transparent text-gray-700 font-medium focus:ring-0"
+                 type="text" name="username" placeholder="Nom d'utilisateur ou email" required autocomplete="username">
+        </div>
+      </div>
+
+      <!-- Champ Mot de passe -->
+      <div>
+        <label for="password" class="block text-gray-700 font-semibold mb-1">Mot de passe</label>
+        <div class="flex items-center border-2 rounded-xl px-3 py-2 bg-gray-50 focus-within:border-indigo-500 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400"
+               viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 
+                  0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                  clip-rule="evenodd"/>
+          </svg>
+          <input class="pl-3 w-full outline-none border-none bg-transparent text-gray-700 font-medium focus:ring-0"
+                 type="password" name="password" placeholder="Mot de passe" required autocomplete="current-password">
+        </div>
+      </div>
+
+      <!-- Bouton Valider -->
+      <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-xl 
+              hover:bg-indigo-700 hover:-translate-y-1 transition-all duration-300 
+              font-semibold text-lg shadow-md">
+        Valider
+      </button>
+
+      <!-- Liens supplémentaires -->
+      <div class="flex justify-between mt-2 text-sm">
+        <a href="#" class="text-indigo-600 hover:underline">Mot de passe oublié ?</a>
+        <a href="{% url 'admin:index' %}" class="text-indigo-600 hover:underline">
+          Contactez l'administrateur
+        </a>
+      </div>
+    </form>
+
+    {% if messages %}
+      <div class="container mt-3">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const usernameInput = document.getElementById('email');
+      if (localStorage.getItem('esante_username')) {
+        usernameInput.value = localStorage.getItem('esante_username');
+        // Ajout d'un effet visuel si pré-rempli
+        usernameInput.classList.add('border-green-400', 'ring-2', 'ring-green-200');
+        setTimeout(() => {
+          usernameInput.classList.remove('border-green-400', 'ring-2', 'ring-green-200');
+        }, 1500);
+      }
+      // À la soumission du formulaire, stocker la valeur
+      const form = usernameInput.closest('form');
+      form.addEventListener('submit', function() {
+        localStorage.setItem('esante_username', usernameInput.value);
+      });
+    });
+  </script>
+</body>
+</html>

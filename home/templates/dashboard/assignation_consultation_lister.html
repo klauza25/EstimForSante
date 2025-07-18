@@ -1,0 +1,77 @@
+<!-- dashboard/assignation_consultation.html -->
+
+{% extends 'dashboard/base.html' %}
+{% block title %}Assignation des consultations{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+  <h3 class="mb-4">Assignation des patients aux médecins</h3>
+
+  <button id="toggleTableBtn" class="btn btn-outline-primary mb-3">
+    <i class="fas fa-eye me-1"></i> Afficher les assignations
+  </button>
+
+  <div id="tableContainer" class="d-none">
+    <div class="table-responsive shadow-sm rounded-3 overflow-hidden">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Patient</th>
+            <th>Médecin</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for consultation in consultations %}
+          <tr>
+            <td>{{ consultation.patient }}</td>
+            <td>{{ consultation.medecin }}</td>
+            <td>{{ consultation.date_consultation|date:"d/m/Y" }}</td>
+            <td>
+              <span class="badge bg-{{ consultation.status|lower }}">
+                {{ consultation.get_status_display }}
+              </span>
+            </td>
+            <td>
+              <div class="btn-group" role="group">
+                <a href="{% url 'modifier_assignation' consultation.id %}" class="btn btn-sm btn-outline-primary">
+                  <i class="fas fa-edit"></i> Modifier
+                </a>
+                {% if consultation.status == 'Planifiée' %}
+                <a href="{% url 'supprimer_assignation' consultation.id %}" class="btn btn-sm btn-outline-danger">
+                  <i class="fas fa-trash"></i> Supprimer
+                </a>
+                {% else %}
+                <button class="btn btn-sm btn-outline-secondary" disabled>
+                  <i class="fas fa-trash"></i> Supprimer
+                </button>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const btn = document.getElementById("toggleTableBtn");
+    const container = document.getElementById("tableContainer");
+
+    btn.addEventListener("click", function () {
+      if (container.classList.contains("d-none")) {
+        container.classList.remove("d-none");
+        btn.innerHTML = '<i class="fas fa-eye-slash me-1"></i> Masquer les assignations';
+      } else {
+        container.classList.add("d-none");
+        btn.innerHTML = '<i class="fas fa-eye me-1"></i> Afficher les assignations';
+      }
+    });
+  });
+</script>
+{% endblock %}

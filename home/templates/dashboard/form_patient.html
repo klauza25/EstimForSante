@@ -1,0 +1,224 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+  .form-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-section h5 {
+    font-weight: 600;
+    color: #333;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .card {
+    transition: transform 0.2s ease-in-out;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+  }
+
+  .btn-rounded {
+    border-radius: 50rem;
+  }
+
+  .form-control:focus,
+  .form-select:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    border-color: #80bdff;
+  }
+</style>
+
+<div class="container mt-5 pt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <div class="card shadow-sm border-0 rounded-3 mb-4">
+        <div class="card-header bg-primary text-white py-3 d-flex align-items-center justify-content-between text-center">
+
+          <h4 class="mb-0 text-uppercase text-center ">Ajouter un Patient</h4>
+        
+          <i class="fas fa-user-injured fa-2x"></i>
+        </div>
+        <div class="card-body p-4">
+
+          <!-- Messages -->
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          <!-- Formulaire principal -->
+          <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+
+            <!-- Informations personnelles -->
+            <div class="form-section">
+              <h5>Informations Personnelles</h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="{{ form.nom.id_for_label }}" class="form-label">{{ form.nom.label }}</label>
+                  {{ form.nom }}
+                  {% if form.nom.errors %}
+                    <div class="text-danger small">{{ form.nom.errors.as_text }}</div>
+                  {% endif %}
+                </div>
+                <div class="col-md-6">
+                  <label for="{{ form.prenom.id_for_label }}" class="form-label">{{ form.prenom.label }}</label>
+                  {{ form.prenom }}
+                  {% if form.prenom.errors %}
+                    <div class="text-danger small">{{ form.prenom.errors.as_text }}</div>
+                  {% endif %}
+                </div>
+                <div class="col-md-6">
+                  <label for="{{ form.date_naissance.id_for_label }}" class="form-label">{{ form.date_naissance.label }}</label>
+                  {{ form.date_naissance }}
+                  {% if form.date_naissance.errors %}
+                    <div class="text-danger small">{{ form.date_naissance.errors.as_text }}</div>
+                  {% endif %}
+                </div>
+                <div class="col-md-6">
+                  <label for="{{ form.sexe.id_for_label }}" class="form-label">{{ form.sexe.label }}</label>
+                  {{ form.sexe }}
+                  {% if form.sexe.errors %}
+                    <div class="text-danger small">{{ form.sexe.errors.as_text }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Coordonnées -->
+            <div class="form-section">
+              <h5>Coordonnées</h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="{{ form.telephone.id_for_label }}" class="form-label">{{ form.telephone.label }}</label>
+                  {{ form.telephone }}
+                  {% if form.telephone.errors %}
+                    <div class="text-danger small">{{ form.telephone.errors.as_text }}</div>
+                  {% endif %}
+                </div>
+                <div class="col-md-6">
+                  <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+                  {{ form.email }}
+                  {% if form.email.errors %}
+                    <div class="text-danger small">{{ form.email.errors.as_text }}</div>
+                  {% endif %}
+                </div>
+                <div class="col-md-12">
+                  <label for="{{ form.adresse.id_for_label }}" class="form-label">{{ form.adresse.label }}</label>
+                  {{ form.adresse }}
+                  {% if form.adresse.errors %}
+                    <div class="text-danger small">{{ form.adresse.errors.as_text }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Paramètres physiques -->
+            <div class="form-section">
+              <h5>Paramètres Physiques</h5>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label for="{{ form.poids.id_for_label }}" class="form-label">{{ form.poids.label }}</label>
+                  {{ form.poids }}
+                  {% if form.poids.errors %}
+                    <div class="text-danger small">{{ form.poids.errors.as_text }}</div>
+                  {% endif %}
+                </div>
+                <div class="col-md-4">
+                  <label for="{{ form.taille.id_for_label }}" class="form-label">{{ form.taille.label }}</label>
+                  {{ form.taille }}
+                  {% if form.taille.errors %}
+                    <div class="text-danger small">{{ form.taille.errors.as_text }}</div>
+                  {% endif %}
+                </div>
+                <div class="col-md-4">
+                  <label for="{{ form.groupe_sanguin.id_for_label }}" class="form-label">{{ form.groupe_sanguin.label }}</label>
+                  {{ form.groupe_sanguin }}
+                  {% if form.groupe_sanguin.errors %}
+                    <div class="text-danger small">{{ form.groupe_sanguin.errors.as_text }}</div>
+                  {% endif %}
+                </div>
+                <div class="col-md-6">
+                  <label for="{{ form.tension_artérielle.id_for_label }}" class="form-label">{{ form.tension_artérielle.label }}</label>
+                  {{ form.tension_artérielle }}
+                  {% if form.tension_artérielle.errors %}
+                    <div class="text-danger small">{{ form.tension_artérielle.errors.as_text }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Historique médical -->
+            <div class="form-section">
+              <h5>Historique Médical</h5>
+              <div class="row g-3">
+                <div class="col-md-12">
+                  <label for="{{ form.allergies.id_for_label }}" class="form-label">{{ form.allergies.label }}</label>
+                  {{ form.allergies }}
+                  {% if form.allergies.errors %}
+                    <div class="text-danger small">{{ form.allergies.errors.as_text }}</div>
+                  {% endif %}
+                </div>
+                <div class="col-md-12">
+                  <label for="{{ form.antecedents_medicaux.id_for_label }}" class="form-label">{{ form.antecedents_medicaux.label }}</label>
+                  {{ form.antecedents_medicaux }}
+                  {% if form.antecedents_medicaux.errors %}
+                    <div class="text-danger small">{{ form.antecedents_medicaux.errors.as_text }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Boutons -->
+            <div class="d-flex justify-content-between mt-4">
+              <a href="{% url 'liste_patients' %}" class="btn btn-outline-secondary btn-rounded">
+                <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+              </a>
+              <button type="submit" class="btn btn-primary btn-rounded">
+                <i class="fas fa-save me-2"></i>{{ submit_button_text|default:"Enregistrer" }}
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SweetAlert2 pour les succès -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2 @11"></script>
+{% if messages %}
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      {% for message in messages %}
+        Swal.fire({
+          icon: "success",
+          title: "Succès",
+          text: "{{ message }}",
+          toast: true,
+          position: "top-end",
+          timer: 3000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+          customClass: {
+            popup: 'swal-pop'
+          }
+        });
+      {% endfor %}
+    });
+  </script>
+{% endif %}
+
+{% endblock %}

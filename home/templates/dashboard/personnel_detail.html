@@ -1,0 +1,49 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Détail du Personnel{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="fw-bold mb-4">Détail du Personnel</h2>
+  <ul class="list-group mb-4">
+    <li class="list-group-item"><strong>Nom :</strong> {{ personnel.nom }}</li>
+    <li class="list-group-item"><strong>Prénom :</strong> {{ personnel.prenom }}</li>
+    <li class="list-group-item"><strong>Rôle :</strong> {{ personnel.role }}</li>
+    <li class="list-group-item"><strong>Email :</strong> {{ personnel.email }}</li>
+    <li class="list-group-item"><strong>Téléphone :</strong> {{ personnel.telephone }}</li>
+    <li class="list-group-item"><strong>Sexe :</strong> {{ personnel.sexe }}</li>
+    {% if personnel.specialite %}
+    <li class="list-group-item"><strong>Spécialité :</strong> {{ personnel.specialite }}</li>
+    {% endif %}
+  </ul>
+
+  <h4>Consultations réalisées</h4>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Patient</th>
+        <th>Date</th>
+        <th>Motif</th>
+        <th>Statut</th>
+        <th>Détail</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for consultation in consultations %}
+      <tr>
+        <td>{{ consultation.patient }}</td>
+        <td>{{ consultation.date_consultation }}</td>
+        <td>{{ consultation.motif }}</td>
+        <td>{{ consultation.status }}</td>
+        <td>
+          <a href="{% url 'consultation_detail' consultation.id %}" class="btn btn-sm btn-info">Voir</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5" class="text-center">Aucune consultation trouvée.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

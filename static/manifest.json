@@ -1,0 +1,14 @@
+{
+  "name": "E-SANTÉ",
+  "short_name": "E-SANTÉ",
+  "start_url": "/login",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/static/images/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

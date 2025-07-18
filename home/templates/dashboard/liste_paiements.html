@@ -1,0 +1,209 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}  {# ✅ Importe les tags de traduction #}
+
+{% block title %}{% trans "Liste des paiements" %}{% endblock %}
+{% load static %}
+
+
+{% block content %}
+<style>
+  .card-stats {
+    transition: transform 0.2s ease;
+  }
+
+  .card-stats:hover {
+    transform: translateY(-5px);
+  }
+
+  .badge-role {
+    font-size: 0.9em;
+    padding: 0.4em 0.6em;
+  }
+
+  .table thead th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+  }
+
+  .text-truncate {
+    max-width: 90%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+</style>
+
+<div class="container mt-5 pt-5">
+  <div class="page-inner">
+
+    <!-- Titre -->
+    <h3 class="fw-bold mb-4">{% trans "Paiements" %}</h3>
+
+    <!-- Filtres -->
+    <form method="get" class="mb-4">
+      <div class="row g-3 align-items-center">
+        <div class="col-md-3">
+          <label for="statut" class="form-label"><strong>{% trans "Filtrer par statut" %}</strong></label>
+          <select name="statut" id="statut" class="form-select" onchange="this.form.submit()">
+            <option value="">{% trans "-- Tous les statuts --" %}</option>
+            {% for key, label in STATUS_PAIEMENT_CHOICES %}
+              <option value="{{ key }}" {% if filtre_statut == key %}selected{% endif %}>
+                {{ label }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label for="patient" class="form-label"><strong>{% trans "Filtrer par patient" %}</strong></label>
+          <select name="patient" id="patient" class="form-select" onchange="this.form.submit()">
+            <option value="">{% trans "-- Tous les patients --" %}</option>
+            {% for p in patients %}
+              <option value="{{ p.id }}" {% if filtre_patient == p.id|stringformat:"s" %}selected{% endif %}>
+                {{ p.nom }} {{ p.prenom }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label for="periode" class="form-label"><strong>{% trans "Filtrer par période" %}</strong></label>
+          <select name="periode" id="periode" class="form-select" onchange="this.form.submit()">
+            <option value="">{% trans "-- Sélectionnez une période --" %}</option>
+            <option value="today" {% if filtre_periode == 'today' %}selected{% endif %}>{% trans "Aujourd'hui" %}</option>
+            <option value="week" {% if filtre_periode == 'week' %}selected{% endif %}>{% trans "Cette semaine" %}</option>
+            <option value="month" {% if filtre_periode == 'month' %}selected{% endif %}>{% trans "Ce mois-ci" %}</option>
+          </select>
+        </div>
+      </div>
+    </form>
+
+    <!-- Tableau des paiements -->
+    <div class="card shadow-sm border-0 rounded-3">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>{% trans "Patient" %}</th>
+                <th>{% trans "Médecin" %}</th>
+                <th>{% trans "Date du paiement" %}</th>
+                <th>{% trans "Type de paiement" %}</th>
+                <th>{% trans "Montant total" %}</th>
+                <th>{% trans "Montant payé" %}</th>
+                <th>{% trans "Différence rendue" %}</th>
+                <th>{% trans "Statut" %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for paiement in paiements %}
+              <tr>
+                <td>{{ paiement.consultation.patient }}</td>
+                <td>{{ paiement.consultation.medecin }}</td>
+                <td>{{ paiement.date_paiement|date:"d/m/Y H:i" }}</td>
+                <td><span class="badge bg-primary">{{ paiement.get_type_paiement_display }}</span></td>
+                <td><strong>{{ paiement.montant_total }} XAF</strong></td>
+                <td>{{ paiement.montant_paye }} XAF</td>
+                <td>
+                  {% if paiement.difference_rendue > 0 %}
+                    <span class="text-warning fw-bold">
+                      {{ paiement.difference_rendue }} XAF
+                    </span>
+                  {% else %}
+                    —
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="badge text-success bg-{{ paiement.status|lower }}">
+                    {{ paiement.get_status_display }}
+                  </span>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="8" class="text-center text-muted py-4">
+                  <i class="fas fa-receipt fa-2x text-secondary mb-2"></i><br/>
+                  {% trans "Aucun paiement trouvé." %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="card-footer d-flex justify-content-between align-items-center">
+        <small>{% blocktrans %}Page {{ paiements.number }} sur {{ paiements.paginator.num_pages }}{% endblocktrans %}</small>
+        <nav aria-label="Page navigation">
+          <ul class="pagination pagination-sm mb-0">
+            {% if paiements.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ paiements.previous_page_number }}">&laquo;</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled">
+                <a class="page-link" href="#">&laquo;</a>
+              </li>
+            {% endif %}
+
+            {% for num in paiements.paginator.page_range %}
+              <li class="page-item {% if paiements.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+              </li>
+            {% endfor %}
+
+            {% if paiements.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ paiements.next_page_number }}">&raquo;</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled">
+                <a class="page-link" href="#">&raquo;</a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Statistiques (optionnel) -->
+    {% if stats %}
+    <div class="row mt-4 g-3">
+      <div class="col-md-3">
+        <div class="card card-stats bg-gradient text-white" style="background: orange;">
+          <div class="card-body text-center">
+            <h5 class="mb-1">{% trans "Total des paiements" %}</h5>
+            <h2 class="fw-bold">{{ stats.total }}</h2>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card card-stats bg-info text-white">
+          <div class="card-body text-center">
+            <h5 class="mb-1">{% trans "Payés" %}</h5>
+            <h2 class="fw-bold">{{ stats.payes }}</h2>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card card-stats bg-success text-white">
+          <div class="card-body text-center">
+            <h5 class="mb-1">{% trans "Partiellement payés" %}</h5>
+            <h2 class="fw-bold">{{ stats.partiels }}</h2>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card card-stats bg-danger text-white">
+          <div class="card-body text-center">
+            <h5 class="mb-1">{% trans "Non payés" %}</h5>
+            <h2 class="fw-bold">{{ stats.non_payes }}</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

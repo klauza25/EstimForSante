@@ -1,0 +1,252 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Tableau de bord Infirmier{% endblock %}
+{% load static %}
+{% block content %}
+
+<style>
+  @media print {
+    body * {
+      visibility: visible;
+    }
+
+    .no-print, .no-print * {
+      visibility: hidden;
+      position: absolute !important;
+      height: 1px;
+      width: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+  }
+</style>
+
+<div class="container mt-4">
+  <div class="page-inner">
+
+    <!-- Titre -->
+    <div class="d-flex align-items-center justify-content-between flex-column flex-md-row pt-2 pb-4">
+      <div>
+        <h3 class="fw-bold mb-3">Bienvenue, Infirmier(ère) {{ request.user.username }}</h3>
+        <h6 class="op-7 mb-0">Tableau de bord infirmier</h6>
+      </div>
+      <div class="no-print">
+        <a href="{% url 'liste_consultations' %}" class="btn btn-outline-primary btn-sm me-2">
+          <i class="fas fa-stethoscope me-1"></i> Toutes les consultations
+        </a>
+        <button onclick="window.print()" class="btn btn-outline-success btn-sm">
+          <i class="fas fa-print me-1"></i> Imprimer
+        </button>
+      </div>
+    </div>
+
+    <!-- Cartes de résumé -->
+    <div class="row g-3 mb-4">
+      <div class="col-sm-6 col-md-3">
+        <div class="card card-stats card-round shadow-sm">
+          <a href="{% url 'liste_consultations' %}" class="text-decoration-none text-dark">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-icon">
+                  <div class="icon-big text-center icon-info bubble-shadow-small">
+                    <i class="fas fa-user-md"></i>
+                  </div>
+                </div>
+                <div class="col ms-3 ms-sm-0">
+                  <div class="numbers">
+                    <p class="card-category">Consultations actives</p>
+                    <h4 class="card-title">{{ consultations.count }}</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-md-3">
+        <div class="card card-stats card-round shadow-sm">
+          <a href="{% url 'liste_patients' %}" class="text-decoration-none text-dark">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-icon">
+                  <div class="icon-big text-center icon-success bubble-shadow-small">
+                    <i class="fas fa-heartbeat"></i>
+                  </div>
+                </div>
+                <div class="col ms-3 ms-sm-0">
+                  <div class="numbers">
+                    <p class="card-category">Patients</p>
+                    <h4 class="card-title">{{ patients.count }}</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-md-3">
+        <div class="card card-stats card-round shadow-sm">
+          <a href="{% url 'liste_examens' %}" class="text-decoration-none text-dark">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-icon">
+                  <div class="icon-big text-center icon-warning bubble-shadow-small">
+                    <i class="fas fa-vials"></i>
+                  </div>
+                </div>
+                <div class="col ms-3 ms-sm-0">
+                  <div class="numbers">
+                    <p class="card-category">Examens en attente</p>
+                    <h4 class="card-title">{{ examens.count }}</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-md-3">
+        <div class="card card-stats card-round shadow-sm">
+          <a href="#" class="text-decoration-none text-dark">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-icon">
+                  <div class="icon-big text-center icon-danger bubble-shadow-small">
+                    <i class="fas fa-calendar-check"></i>
+                  </div>
+                </div>
+                <div class="col ms-3 ms-sm-0">
+                  <div class="numbers">
+                    <p class="card-category">Rendez-vous</p>
+                    <h4 class="card-title">{{ rendez_vous.count }}</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Consultations -->
+<div class="card shadow-sm border-0 rounded-3 mb-4">
+  <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Consultations planifiées ou en cours</h5>
+    <a href="{% url 'liste_consultations' %}" class="btn btn-sm btn-outline-primary">
+      Voir toutes <i class="fas fa-arrow-right ms-1"></i>
+    </a>
+  </div>
+  <div class="card-body p-0">
+    {% if consultations %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Patient</th>
+            <th>Date</th>
+            <th>Motif</th>
+            <th>Médecin</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in consultations %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td><a href="{% url 'patient_detail' c.patient.id %}">{{ c.patient.nom }} {{ c.patient.prenom }}</a></td>
+            <td>{{ c.date_consultation|date:"d/m/Y H:i" }}</td>
+            <td>{{ c.get_motif_display }}</td>
+            <td><a href="{% url 'personnel_detail' c.medecin.id %}">{{ c.medecin.nom }} {{ c.medecin.prenom }}</a></td>
+            <td><span class="badge bg-{{ c.get_status_badge }}">{{ c.get_status_display }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-4 text-muted">Aucune consultation active.</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Section Médecins Disponibles -->
+<div class="card shadow-sm border-0 rounded-3 mb-4">
+  <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Médecins disponibles</h5>
+    <a href="{% url 'users_online' %}" class="btn btn-sm btn-outline-primary">
+      Voir tous <i class="fas fa-arrow-right ms-1"></i>
+    </a>
+  </div>
+  <div class="card-body p-0">
+    {% if medecins %}
+    <ul class="list-group list-group-flush">
+      {% for m in medecins %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>{{ m.nom }} {{ m.prenom }}</span>
+        <span class="badge bg-primary text-uppercase">{{ m.role }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="text-center py-4 text-muted">Aucun médecin disponible.</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Section Examens en attente -->
+<div class="card shadow-sm border-0 rounded-3 mb-4">
+  <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Examens médicaux en attente</h5>
+    <a href="{% url 'liste_examens' %}" class="btn btn-sm btn-outline-primary">
+      Voir tous <i class="fas fa-arrow-right ms-1"></i>
+    </a>
+  </div>
+  <div class="card-body p-0">
+    {% if examens %}
+    <ul class="list-group list-group-flush">
+      {% for e in examens %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        {{ e.nom }}
+        <span class="badge bg-warning text-dark text-uppercase">{{ e.statut }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="text-center py-4 text-muted">Aucun examen en attente.</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Section Rendez-vous -->
+<div class="card shadow-sm border-0 rounded-3 mb-4">
+  <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Rendez-vous</h5>
+    <a href="{% url 'liste_rendezvous' %}" class="btn btn-sm btn-outline-primary">
+      Voir tous <i class="fas fa-arrow-right ms-1"></i>
+    </a>
+  </div>
+  <div class="card-body p-0">
+    {% if rendez_vous %}
+    <ul class="list-group list-group-flush">
+      {% for rdv in rendez_vous %}
+      <li class="list-group-item">
+        <strong>{{ rdv.patient.nom }} {{ rdv.patient.prenom }}</strong> – 
+        {{ rdv.motif }} à {{ rdv.heure_debut|time:"H:i" }}
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="text-center py-4 text-muted">Aucun rendez-vous prévu.</div>
+    {% endif %}
+  </div>
+</div>
+
+
+  </div>
+</div>
+
+{% endblock %}

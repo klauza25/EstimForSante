@@ -1,0 +1,73 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+{% block title %}Assignation de consultation{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="page-inner">
+    <div class="d-flex align-items-center justify-content-between">
+      <h3 class="fw-bold mb-3">Assignation de Consultation</h3>
+    </div>
+
+    <!-- Formulaire d'assignation -->
+    <form method="POST" action="{% url 'assignation_consultation' %}">
+      {% csrf_token %}
+
+      <div class="row g-3">
+        <!-- Sélection du patient -->
+        <div class="col-md-6">
+          <label for="patient" class="form-label">Patient</label>
+          <select name="patient" id="patient" class="form-select" required>
+            <option value="">Sélectionnez un patient</option>
+            {% for patient in patients %}
+              <option value="{{ patient.id }}" {% if patient.id|slugify == request.POST.patient|slugify %}selected{% endif %}>
+                {{ forloop.counter }}. {{ patient.nom }} {{ patient.prenom }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Sélection du médecin -->
+        <div class="col-md-6">
+          <label for="medecin" class="form-label">Médecin</label>
+          <select name="medecin" id="medecin" class="form-select" required>
+            <option value="">Sélectionnez un médecin</option>
+            {% for medecin in medecins %}
+              <option value="{{ medecin.id }}" {% if medecin.id|slugify == request.POST.medecin|slugify %}selected{% endif %}>
+                Dr. {{ medecin.nom }} {{ medecin.prenom }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <!-- Bouton d'assignation -->
+      <div class="mt-4">
+        <button type="submit" class="btn btn-primary btn-lg">
+          <i class="fas fa-calendar-check me-1"></i> Assigner
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- SweetAlert2 pour les messages -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2 @11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2 @11"></script>
+
+<!-- Affichage des messages Django -->
+{% if messages %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    {% for message in messages %}
+    Swal.fire({
+      icon: 'success',
+      title: 'Succès',
+      text: '{{ message }}',
+      confirmButtonText: 'OK'
+    });
+    {% endfor %}
+  });
+</script>
+{% endif %}
+{% endblock %}

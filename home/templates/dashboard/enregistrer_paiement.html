@@ -1,0 +1,92 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Enregistrer un paiement - {{ consultation.patient }}{% endblock %}
+{% load i18n %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-primary text-white py-3 d-flex align-items-center justify-content-between">
+          <h4 class="mb-0">Enregistrer un paiement</h4>
+          <i class="fas fa-receipt fs-4"></i>
+        </div>
+
+        <div class="card-body p-4">
+          <!-- Informations -->
+          <div class="alert alert-info mb-4">
+            <strong>Patient :</strong> {{ consultation.patient }}<br/>
+            <strong>Type de consultation :</strong> {{ consultation.type_consultation }}<br/>
+            <strong>Montant dû :</strong> 
+            <span id="montant-du">{{ form.montant_total.value|default:consultation.get_montant_du }}</span> XAF
+          </div>
+
+          <!-- Formulaire -->
+          <form method="post" novalidate id="paiement-form">
+            {% csrf_token %}
+            
+            {{ form.as_p }}
+            
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-success">
+                <i class="fas fa-save me-1"></i> Valider le paiement
+              </button>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Retour -->
+        <div class="card-footer text-end">
+          <a href="{% url 'consultation_detail' consultation.id %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Retour
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Update Montant dû dynamically when montant_total field changes
+  document.addEventListener('DOMContentLoaded', function() {
+    const montantTotalInput = document.querySelector('input[name="montant_total"]');
+    const montantDuSpan = document.getElementById('montant-du');
+
+    if (montantTotalInput && montantDuSpan) {
+      // Initialize display
+      montantDuSpan.textContent = montantTotalInput.value || montantDuSpan.textContent;
+
+      // Listen for input changes
+      montantTotalInput.addEventListener('input', function() {
+        montantDuSpan.textContent = this.value || '0.00';
+      });
+    }
+  });
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const montantTotalInput = document.querySelector('input[name="montant_total"]');
+    const montantPayeInput = document.querySelector('input[name="montant_paye"]');
+    const differenceRendueInput = document.querySelector('input[name="difference_rendue"]');
+
+    function updateDifferenceRendue() {
+      const montantTotal = parseFloat(montantTotalInput.value) || 0;
+      const montantPaye = parseFloat(montantPayeInput.value) || 0;
+      const difference = montantPaye - montantTotal;
+      differenceRendueInput.value = difference > 0 ? difference.toFixed(2) : '0.00';
+    }
+
+    if (montantPayeInput && montantTotalInput && differenceRendueInput) {
+      // Initialize difference on page load
+      updateDifferenceRendue();
+
+      // Update difference when montant_paye changes
+      montantPayeInput.addEventListener('input', updateDifferenceRendue);
+
+      // Optional: update difference if montant_total changes dynamically
+      montantTotalInput.addEventListener('input', updateDifferenceRendue);
+    }
+  });
+</script>
+{% endblock %}

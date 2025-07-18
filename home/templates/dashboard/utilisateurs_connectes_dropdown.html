@@ -1,0 +1,17 @@
+<!-- utilisateurs_connectes_dropdown.html -->
+{% if users %}
+  {% for user in users %}
+  <a href="#" class="d-flex align-items-center text-decoration-none text-dark">
+    <div class="notif-img">
+      <img src="{% static 'assets/img/profile.png' %}" alt="Profil" width="32" height="32" class="rounded-circle me-2">
+    </div>
+    <div class="notif-content flex-grow-1">
+      <span class="subject">{{ user.username }}</span><br/>
+      <span class="block small text-muted">Role: {{ user.get_role_display|default:user.role }}</span>
+      <span class="time small text-secondary">{{ user.last_seen|timesince }} ago</span>
+    </div>
+  </a>
+  {% endfor %}
+{% else %}
+  <div class="text-center py-2 text-muted">Aucun utilisateur en ligne.</div>
+{% endif %}

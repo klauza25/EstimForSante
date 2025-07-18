@@ -1,0 +1,201 @@
+{% extends 'dashboard/base.html' %}
+{% load humanize %} {# Pour formater les nombres #}
+{% block title %}
+  Ordonnances{% if patient %} - {{ patient.nom }} {{ patient.prenom }}{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-primary">
+      {% if patient %}
+        Ordonnances du patient : {{ patient.nom|title }} {{ patient.prenom|title }}
+      {% else %}
+        Liste des ordonnances
+      {% endif %}
+    </h2>
+
+    {% if patient %}
+      <a href="{% url 'creer_ordonnance' consultation_id=consultation.id %}" class="btn btn-success">
+        <i class="fas fa-prescription me-1"></i> Créer une ordonnance
+      </a>
+    {% endif %}
+  </div>
+
+  <!-- Informations complémentaires -->
+  {% if patient %}
+  <div class="alert alert-info mb-4">
+    <strong>Patient :</strong> {{ patient.nom }} {{ patient.prenom }}<br/>
+    <strong>Date de naissance :</strong> {{ patient.date_naissance|date:"d/m/Y" }}<br/>
+    <strong>Sexe :</strong> {{ patient.get_sexe_display }}
+  </div>
+  {% endif %}
+
+  <!-- Tableau des ordonnances -->
+  <div class="table-responsive shadow-sm rounded-3 overflow-hidden">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th scope="col">Patient / Date</th>
+          <th scope="col">Médicament</th>
+          <th scope="col">Quantité</th>
+          <th scope="col">Date</th>
+          <th scope="col">Détails</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ordonnance in ordonnances %}
+        <tr class="align-middle">
+          <td class="fw-bold">
+            {{ ordonnance.patient }}
+            <br><small class="text-muted">{{ ordonnance.date_prescription|date:"d/m/Y H:i" }}</small>
+          </td>
+          <td>
+            <div>{{ ordonnance.nom_medicament }}</div>
+            {% if ordonnance.fda_info %}
+              <button type="button" class="btn btn-link btn-sm p-0 mt-1" 
+                      data-bs-toggle="modal" 
+                      data-bs-target="#drugInfo{{ ordonnance.id }}">
+                <i class="fas fa-info-circle text-primary me-1"></i> Plus d'infos
+              </button>
+            {% endif %}
+          </td>
+          <td>
+            <span class="badge bg-success">{{ ordonnance.quantite|intcomma }}</span><br/>
+            <small class="text-muted">{{ ordonnance.duree }}</small>
+          </td>
+          <td>
+            {{ ordonnance.date_prescription|date:"d/m/Y" }}
+          </td>
+          <td>
+            <div class="btn-group" role="group">
+              {% if request.user.role == 'medecin' and ordonnance.consultation.medecin.user == request.user %}
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="window.print()">
+                  <i class="fas fa-print me-1"></i> Imprimer
+                </button>
+              {% else %}
+                <button type="button" class="btn btn-outline-secondary btn-sm" disabled>
+                  <i class="fas fa-lock me-1"></i> Non autorisé
+                </button>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+
+        <!-- Modal avec détails du médicament -->
+        {% if ordonnance.fda_info %}
+        <div class="modal fade" id="drugInfo{{ ordonnance.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Informations sur {{ ordonnance.nom_medicament }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+              </div>
+              <div class="modal-body">
+                {% if ordonnance.fda_info.indications %}
+                <div class="mb-3">
+                  <h6 class="text-primary fw-semibold">Indications :</h6>
+                  <p>{{ ordonnance.fda_info.indications|default:"Aucune information disponible." }}</p>
+                </div>
+                {% endif %}
+
+                {% if ordonnance.fda_info.dosage %}
+                <div class="mb-3">
+                  <h6 class="text-primary fw-semibold">Posologie recommandée :</h6>
+                  <p>{{ ordonnance.fda_info.dosage|default:"—" }}</p>
+                </div>
+                {% endif %}
+
+                {% if ordonnance.fda_info.warnings %}
+                <div class="mb-3">
+                  <h6 class="text-warning fw-semibold">Avertissements :</h6>
+                  <p>{{ ordonnance.fda_info.warnings|default:"—" }}</p>
+                </div>
+                {% endif %}
+
+                {% if ordonnance.fda_info.side_effects %}
+                <div class="mb-3">
+                  <h6 class="text-danger fw-semibold">Effets secondaires possibles :</h6>
+                  <p>{{ ordonnance.fda_info.side_effects|default:"—" }}</p>
+                </div>
+                {% endif %}
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Fermer</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        {% empty %}
+        <tr>
+          <td colspan="5" class="text-center text-muted py-4">
+            <i class="fas fa-prescription fa-2x text-muted mb-2"></i><br/>
+            Aucune ordonnance trouvée.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  {% if ordonnances.has_other_pages %}
+  <nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% if ordonnances.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ ordonnances.previous_page_number }}" aria-label="Précédent">
+            <span>&laquo;</span>
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">&laquo;</span>
+        </li>
+      {% endif %}
+
+      {% for i in ordonnances.paginator.page_range %}
+        <li class="page-item {% if ordonnances.number == i %}active{% endif %}">
+          <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+        </li>
+      {% endfor %}
+
+      {% if ordonnances.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ ordonnances.next_page_number }}" aria-label="Suivant">
+            <span>&raquo;</span>
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">&raquo;</span>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+
+  <!-- Bouton retour -->
+  <div class="mt-4 text-end">
+    {% if patient %}
+      <a href="{% url 'liste_patients' %}" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-arrow-left me-1"></i> Retour aux patients
+      </a>
+    {% else %}
+      <a href="{% url 'dashboard_accueil' %}" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-home me-1"></i> Retour au tableau de bord
+      </a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Optionnel : Ajouter une icône de chargement pendant la recherche des info FDA
+  document.addEventListener('DOMContentLoaded', function () {
+    console.log("Template ordonnances chargé.");
+  });
+</script>
+{% endblock %}

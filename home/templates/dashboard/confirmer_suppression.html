@@ -1,0 +1,29 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-5 pt-5 text-center">
+
+    <h2>Confirmer la suppression</h2>
+
+    <!-- Formulaire de Confirmation -->
+    <form method="post" class="d-inline">
+        {% csrf_token %}
+
+        <h3>Voulez-vous vraiment supprimer :</h3>
+        <h2 class="text-danger">{{ patient.nom }} {{ patient.prenom }} ?</h2>
+
+        <!-- Bouton Supprimer -->
+        <button type="submit" class="btn btn-danger rounded-pill">
+            ❌ Supprimer
+        </button>
+    </form>
+
+    <!-- Lien Annuler -->
+    <a href="{% url 'liste_patients' %}" class="btn btn-secondary rounded-pill ms-3">
+        🔙 Annuler
+    </a>
+
+</div>
+
+{% endblock %}

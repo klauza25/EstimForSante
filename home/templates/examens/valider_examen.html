@@ -1,0 +1,43 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+  <div class="page-inner">
+
+    <div class="mb-4">
+      <h3 class="fw-bold">Validation de l'examen : {{ examen.nom }}</h3>
+      <p><strong>Patient :</strong> {{ examen.consultation.patient.nom }} {{ examen.consultation.patient.prenom }}</p>
+      <p><strong>Date consultation :</strong> {{ examen.consultation.date_consultation|date:"d/m/Y H:i" }}</p>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="id_date_examen" class="form-label">Date de l'examen</label>
+            {{ form.date_examen }}
+          </div>
+
+          <div class="mb-3">
+            <label for="id_resultat" class="form-label">Résultat de l'examen</label>
+            {{ form.resultat }}
+          </div>
+
+          <div class="mb-3">
+            <label for="id_statut" class="form-label">Statut</label>
+            {{ form.statut }}
+          </div>
+
+          <button type="submit" class="btn btn-success">
+            <i class="fas fa-check-circle"></i> Valider l'examen
+          </button>
+          <a href="{% url 'liste_examens' %}" class="btn btn-secondary">Annuler</a>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="fr">
+{% load static %}
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>{% block title %}Docteur{% endblock %} Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css " />
+  <link rel="icon" href="{% static 'assets/img/esante.png' %}" type="image/x-icon" />
+
+  <!-- Fonts and icons -->
+  <script src="{% static 'assets/js/plugin/webfont/webfont.min.js' %}"></script>
+  <script>
+    WebFont.load({
+      google: { families: ["Public Sans:300,400,500,600,700"] },
+      custom: {
+        families: [
+          "Font Awesome 5 Solid",
+          "Font Awesome 5 Regular",
+          "Font Awesome 5 Brands",
+          "simple-line-icons"
+        ],
+        urls: ["{% static 'assets/css/fonts.min.css' %}"]
+      },
+      active: function () {
+        sessionStorage.fonts = true;
+      }
+    });
+  </script>
+
+  <!-- CSS Files -->
+  <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'assets/css/plugins.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'assets/css/kaiadmin.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'assets/css/demo.css' %}" />
+
+  <!-- Print Styles -->
+  <style>
+    @media print {
+      body * {
+        visibility: hidden !important;
+      }
+      .container, .container * {
+        visibility: visible !important;
+      }
+      .no-print, .no-print * {
+        display: none !important;
+      }
+      .container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        background: white !important;
+        box-shadow: none !important;
+      }
+    }
+
+
+    html, body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.wrapper {
+  flex: 1 0 auto;
+}
+
+.footer {
+  flex-shrink: 0;
+}
+
+
+#loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+#loading-overlay img {
+      animation: pulse 1.5s infinite;
+    }
+
+@keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.6); }
+      100% { transform: scale(2); }
+    }
+  </style>
+</head>
+
+<body class="" {% if request.user.is_docteur %} style="" {% elif request.user.is_infirmiers %} style="background-color:lightgray;" {% endif %}>
+
+  <div id="loading-overlay">
+    <img src="{% static 'assets/img/esante.png' %}" width="180px" height="90px" alt="Loading...">
+  </div>
+
+<div class="wrapper">
+
+  <!-- Sidebar -->
+<div class="sidebar" data-background-color="dark">
+
+  <div class="sidebar-logo">
+    <div class="logo-header" data-background-color="dark">
+      <a href="/" class="logo">
+        <img src="{% static 'assets/img/esante.png' %}" width="180px" height="90px" > 
+      </a>
+      <div class="nav-toggle">
+        <button class="btn btn-toggle toggle-sidebar" aria-label="Toggle Sidebar">
+          <i class="gg-menu-right"></i>
+        </button>
+        <button class="btn btn-toggle sidenav-toggler" aria-label="Toggle Sidenav">
+          <i class="gg-menu-left"></i>
+        </button>
+      </div>
+      <button class="topbar-toggler more" aria-label="More Options">
+        <i class="gg-more-vertical-alt"></i>
+      </button>
+    </div>
+  </div>
+  
+<!-- end logo nav -->
+
+  <div class="sidebar-wrapper scrollbar scrollbar-inner">
+    <div class="sidebar-content">
+      <ul class="nav nav-secondary">
+
+        <!-- Accueil -->
+        <li class="nav-item active">
+          <a data-bs-toggle="collapse" href="#dashboard" class="collapsed" aria-expanded="false">
+            <i class="fas fa-home"></i>
+            <p>E_santé</p>
+            <span class="caret"></span>
+          </a>
+          <div class="collapse" id="dashboard">
+            <ul class="nav nav-collapse">
+              <li><a href="/"><span class="sub-item">Dashboard {{ user }}</span></a></li>
+            </ul>
+          </div>
+        </li>
+
+        <!-- Fonctionnalités -->
+        <li class="nav-section">
+          <span class="sidebar-mini-icon"><i class="fa fa-ellipsis-h"></i></span>
+          <h4 class="text-section">Fonctionnalités</h4>
+        </li>
+
+        <!-- Patients -->
+        {% if request.user.role == "accueil" or request.user.role == "infirmier" %}
+ 
+<li class="nav-item">
+  <a data-bs-toggle="collapse" href="#patients">
+    <i class="fas fa-user-injured me-2"></i>
+    <p>Patients</p>
+    <span class="caret"></span>
+  </a>
+  <div class="collapse" id="patients">
+    <ul class="nav nav-collapse">
+      <li><a href="{% url 'liste_patients' %}"><span class="sub-item">Liste des patients</span></a></li>
+      <li><a href="{% url 'ajouter_patient' %}"><span class="sub-item">Ajouter un patient</span></a></li>
+    </ul>
+  </div>
+</li>
+        {% endif %}
+
+        <!-- Assignation Consultations -->
+        {% if request.user.role == "accueil" %}
+          <li class="nav-item">
+            <a href="{% url 'assignation_consultation' %}">
+              <i class="fas fa-calendar-check"></i>
+              <p>Assignation Consultations</p>
+            </a>
+          </li>
+        <li class="nav-item">
+  <a data-bs-toggle="collapse" href="#paiement">
+    <i class="fas fa-coins me-2"></i>
+    <p>Payments</p>
+    <span class="caret"></span>
+  </a>
+  <div class="collapse" id="paiement">
+    <ul class="nav nav-collapse">
+      <li><a href="{% url 'liste_paiements' %}" class="sub-item">View all payments</a></li>
+      <li><a href="{% url 'caisse' %}" class="sub-item">Payment reports</a></li>
+    </ul>
+  </div>
+</li>
+
+        {% endif %}
+
+        
+        
+        <!-- Médicaments -->
+        {% comment %} {% if request.user.role == "infirmier" or request.user.role == "medecin" %}
+          <li class="nav-item">
+            <a data-bs-toggle="collapse" href="#medicaments">
+              <i class="fas fa-capsules"></i>
+              <p>Médicaments</p>
+              <span class="caret"></span>
+            </a>
+            <div class="collapse" id="medicaments">
+              <ul class="nav nav-collapse">
+                <li><a href=""><span class="sub-item">Liste des médicaments</span></a></li>
+                <li><a href=""><span class="sub-item">Ajouter un médicament</span></a></li>
+              </ul>
+            </div>
+          </li>
+        {% endif %} {% endcomment %}
+
+      <!-- Consulter -->
+{% if request.user.role == "medecin" or request.user.role == "infirmier" %}
+  <li class="nav-item">
+    <a data-bs-toggle="collapse" href="#consultations">
+      <i class="fas fa-file-signature"></i>
+      <p>Consulter</p>
+      <span class="caret"></span>
+    </a>
+    <div class="collapse" id="consultations">
+      <ul class="nav nav-collapse">
+        <li><a href="{% url 'create_consultation' %}"><span class="sub-item">Nouvelle consultation</span></a></li>
+        <li><a href="{% url 'liste_consultations' %}"><span class="sub-item">Mes consultations</span></a></li>
+        {% comment %} {% if request.user.role == "medecin" %}
+         <!-- Sidebar -->
+
+         
+<li class="nav-item">
+  <a data-bs-toggle="collapse" href="#reassignation">
+    <i class="fas fa-arrow-right text-warning me-2"></i>
+    <p>Réaffecter une consultation</p>
+    <span class="caret"></span>
+  </a>
+  <div class="collapse" id="reassignation">
+    <ul class="nav nav-collapse">
+      <li><a href="{% url 'reassignation_consultation' %}"><span class="sub-item">Nouvelle réaffectation</span></a></li>
+    </ul>
+  </div>
+</li> {% endif %}
+      </ul> {% endcomment %}
+    </div>
+  </li>
+{% endif %}
+
+
+        <!-- Examens -->
+        {% if request.user.role == "infirmier" or request.user.role == "medecin" or request.user.role == "accueil"  %}
+          <li class="nav-item">
+            <a data-bs-toggle="collapse" href="#examens">
+              <i class="fas fa-syringe"></i>
+              <p>Examens</p>
+              <span class="caret"></span>
+            </a>
+            <div class="collapse" id="examens">
+              <ul class="nav nav-collapse">
+                <li><a href="{% url 'liste_examens' %}"><span class="sub-item">Liste des examens</span></a></li>
+              </ul>
+            </div>
+          </li>
+          
+          <!-- Add this snippet in your base.html where you want to show the ordonnance list or link -->
+
+<li class="nav-item">
+  <a href="{% url 'liste_ordonnances' %}">
+    <i class="fas fa-prescription-bottle-alt"></i>
+    <p>Ordonnances</p>
+  </a>
+</li>
+
+        {% endif %}
+
+        <!-- Personnel -->
+        {% if request.user.role == "medecin" %}
+          <li class="nav-item">
+            <a href="{% url 'liste_personnel' %}">
+              <i class="fas fa-users"></i>
+              <p>Personnel</p>
+              <span class="badge badge-success">{{ personnels.count }}</span>
+            </a>
+          </li>
+        {% endif %}
+
+        <!-- Historique -->
+        {% if request.user.role == "medecin" or request.user.role == "infirmier" %}
+          <li class="nav-item">
+            <a href="{% url 'historique_clinique' %}">
+              <i class="fas fa-history"></i>
+              <p>Historique de la clinique</p>
+            </a>
+          </li>
+          {% endif %}
+          <!-- dashboard/sidebar.html -->
+ {% if request.user.role == "medecin" or request.user.role == "accueil" %}
+<li class="nav-item">
+  <a data-bs-toggle="collapse" href="#rendezvous">
+    <i class="fas fa-calendar-alt me-2"></i>
+    <p>Rendez-vous</p>
+    <span class="caret"></span>
+  </a>
+  <div class="collapse" id="rendezvous">
+    <ul class="nav nav-collapse">
+      <li><a href="{% url 'liste_rendezvous' %}"><span class="sub-item">Voir mes rendez-vous</span></a></li>
+    </ul>
+  </div>
+</li>
+        {% endif %}
+
+      </ul>
+      
+    </div>
+  </div>
+</div>
+<!-- End Sidebar -->
+  <!-- Main Panel -->
+  <div class="main-panel">
+    <div class="main-header">
+      <div class="main-header-logo">
+        <div class="logo-header" data-background-color="dark">
+          <a href="/" class="logo">
+            <i class="fas fa-stethoscope fs-1 text-white"></i>
+          </a>
+          <div class="nav-toggle">
+            <button class="btn btn-toggle toggle-sidebar">
+              <i class="gg-menu-right"></i>
+            </button>
+            <button class="btn btn-toggle sidenav-toggler">
+              <i class="gg-menu-left"></i>
+            </button>
+          </div>
+          <button class="topbar-toggler more">
+            <i class="gg-more-vertical-alt"></i>
+          </button>
+        </div>
+      </div>
+
+<!-- Navbar Header -->
+<nav class="navbar navbar-header navbar-expand-lg border-bottom shadow-sm bg-white">
+  <div class="container-fluid">
+
+    <!-- Titre dynamique -->
+    <div class="d-flex align-items-center">
+      <i class="fas fa-user-md me-3 text-primary fs-4 animate__animated animate__fadeInLeft"></i>
+      <h4 class="mb-0 fw-semibold text-primary">
+        {% if request.user.role == "medecin" %}
+          Espace Médecin
+        {% elif request.user.role == "infirmier" %}
+          Espace Infirmier
+        {% elif request.user.role == "accueil" %}
+          Espace Accueil
+        {% elif request.user.role == "pharmacien" %}
+          Espace Pharmacien
+        {% else %}
+          Espace Utilisateur
+        {% endif %}
+      </h4>
+    </div>
+
+    <!-- Menu utilisateur -->
+    <ul class="navbar-nav ms-auto align-items-center gap-3">
+
+      <!-- Utilisateurs en ligne -->
+      <li class="nav-item dropdown">
+        <a class="nav-link position-relative" href="#" id="onlineUserDropdown" role="button"
+           data-bs-toggle="dropdown" aria-expanded="false" title="Utilisateurs en ligne">
+          <i class="fas fa-users-cog fs-5 text-secondary"></i>
+          <span id="online-users-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">
+            {{ count }}
+            <span class="visually-hidden">utilisateurs en ligne</span>
+          </span>
+        </a>
+
+        <ul class="dropdown-menu dropdown-menu-end shadow-sm py-0" aria-labelledby="onlineUserDropdown">
+          <li><h6 class="dropdown-header py-2">Qui est connecté ?</h6></li>
+          <li>
+            <div id="online-users-list" class="px-0 small">
+              <div class="container py-0">
+                <div class="card shadow-lg border-0 rounded-4 mx-auto" style="max-width: 700px;">
+                  <div class="card-header bg-gradient text-primary text-center" style="background: linear-gradient(45deg, #0d6efd, #6610f2);">
+                    <h4 class="mb-0">
+                      <i class="fas fa-user-group"></i> Utilisateurs en ligne : 
+                      <span class="fw-bold">{{ count }}</span>
+                    </h4>
+                  </div>
+                  <div class="card-body p-1">
+                    <ul class="list-group list-group-flush">
+                      {% for user in active_users %}
+                      <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                          <i class="bi bi-person-circle fs-4 text-primary"></i>
+                          <span class="fw-semibold">{{ user.username }}</span>
+                          <span class="fw-semibold text-danger ms-2">{{ user.login_time|date:"H:i:s" }}</span>
+                        </div>
+                        <span class="badge bg-success fs-4 rounded-pill">
+                          <span class="spinner-grow">●</span> En ligne
+                        </span>
+                      </li>
+                      {% empty %}
+                      <li class="list-group-item text-muted text-center">
+                        Aucun utilisateur en ligne pour le moment.
+                      </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li><hr class="dropdown-divider m-0"></li>
+          <li>
+            <a class="dropdown-item text-center py-2 small text-primary fw-bold" href="{% url 'users_online' %}">
+              Voir tous les utilisateurs en ligne
+            </a>
+          </li>
+        </ul>
+      </li>
+
+     <!-- Notifications -->
+<li class="nav-item dropdown">
+  <a class="nav-link position-relative" href="#" id="notifDropdown" role="button"
+     data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifications">
+    <i class="fa fa-bell fs-5 text-secondary"></i>
+    {% if count_notifications > 0 %}
+    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+      {{ count_notifications }}
+    </span>
+    {% endif %}
+  </a>
+
+  <ul class="dropdown-menu dropdown-menu-end shadow-sm py-0" aria-labelledby="notifDropdown">
+    <li><h6 class="dropdown-header py-3">Notifications</h6></li>
+
+    {% if consultations %}
+      <li>
+        <div class="table-responsive" style="max-height: 150px; overflow-y: auto;">
+          <table class="table table-hover mb-0">
+            <thead class="table-light sticky-top bg-white">
+              <tr>
+                <th scope="col">Patient</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for consultation in consultations|slice:":3" %}
+                {% if consultation.status != "Terminée" %}
+                  <tr class="align-middle">
+                    <td class="small">{{ consultation.patient.nom }} {{ consultation.patient.prenom }}</td>
+                    <td>
+                      <a href="{% url 'patient_detail' consultation.patient.id %}" 
+                         class="btn btn-sm btn-outline-primary m-1" title="Voir détails">
+                        <i class="fas fa-eye"></i>
+                      </a>
+                      <a href="{% url 'update_consultation' consultation.id %}" 
+                         class="btn btn-sm btn-primary m-1" title="Consulter">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                    </td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </li>
+      <li><hr class="dropdown-divider m-0"></li>
+    {% else %}
+      <li><span class="dropdown-item text-muted small py-2">Aucune notification</span></li>
+      <li><hr class="dropdown-divider m-0"></li>
+    {% endif %}
+
+    <li>
+      <a class="dropdown-item text-center small text-primary fw-bold py-2" href="{% url 'mes_consultations' %}">
+        Voir toutes les notifications
+      </a>
+    </li>
+  </ul>
+</li>
+
+<hr class="dropdown-divider m-0"></li>
+ 
+</ul>
+
+
+      <!-- Profil utilisateur -->
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#"
+           id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="User menu">
+          <!-- Avatar -->
+          <div class="avatar-md me-3 position-relative">
+            <img src="{% static 'assets/img/profile2.jpg' %}" alt="Profil"
+                 class="avatar-img rounded-circle border border-primary shadow-sm"
+                 style="width: 60px; height: 60px;">
+            <!-- Statut en ligne -->
+            <span class="position-absolute bottom-0 end-0 translate-middle badge bg-success rounded-pill p-1"
+                  style="width: 16px; height: 16px;" title="En ligne"></span>
+          </div>
+
+          <!-- Infos utilisateur (visible sur desktop) -->
+          <div class="d-none d-md-block text-end">
+            <div class="fw-bold text-dark">{{ request.user.username }}</div>
+            <small class="text-muted fst-italic">
+              {{ request.user.get_role_display|capfirst }}
+            </small>
+          </div>
+        </a>
+
+        <!-- Dropdown menu -->
+        <ul class="dropdown-menu dropdown-menu-end shadow-lg py-0" aria-labelledby="userDropdown">
+          <li class="dropdown-header text-truncate">
+            <strong>{{ request.user.username }}</strong><br/>
+            <small class="text-muted">{{ request.user.get_role_display|capfirst }}</small>
+          </li>
+          <li><hr class="dropdown-divider m-0"></li>
+
+          <!-- Panel Admin -->
+          {% if request.user.is_superuser %}
+          <li>
+            <a class="dropdown-item d-flex align-items-center py-3" href="{% url 'admin:index' %}">
+              <i class="fas fa-shield-alt me-2 text-primary"></i> Panel Administrateur
+            </a>
+          </li>
+          <li><hr class="dropdown-divider m-0"></li>
+          {% endif %}
+
+          <!-- Statut -->
+          <li>
+            <a class="dropdown-item d-flex align-items-center py-3" href="#">
+              <i class="fas fa-circle text-success me-2"></i> Statut : Actif
+            </a>
+          </li>
+          <li><hr class="dropdown-divider m-0"></li>
+
+          <!-- Déconnexion -->
+          <li>
+            <a class="dropdown-item d-flex align-items-center py-3 text-danger" href="{% url 'logout' %}">
+              <i class="fas fa-sign-out-alt me-2"></i> Déconnexion
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Add Animate.css CDN in your base.html head for animations -->
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/> -->
+
+</div>
+
+    <!-- Block Content -->
+    <div class="container-fluid mb-5 py-5">
+      {% block content %}{% endblock %}
+    </div>
+
+  <!-- Footer -->
+<footer class="footer py-2 mt-auto border-top bg-white bottom-5">
+  <div class="container d-flex flex-wrap justify-content-between align-items-center">
+    <div class="col-md-4 d-flex align-items-center">
+      <a href="/" class="me-2 text-decoration-none">
+        <i class="fas fa-stethoscope text-muted fs-4"></i>
+      </a>
+      <span class="text-muted">© 2025 Company, E-santé</span>
+    </div>
+    <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+      <li class="ms-3"><a class="text-muted" href="#"><i class="fab fa-twitter"></i></a></li>
+      <li class="ms-3"><a class="text-muted" href="#"><i class="fab fa-instagram"></i></a></li>
+      <li class="ms-3"><a class="text-muted" href="#"><i class="fab fa-facebook"></i></a></li>
+    </ul>
+  </div>
+</footer>
+
+ <!--   Core JS Files   -->
+    <script src="{% static 'assets/js/core/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'assets/js/core/popper.min.js' %}"></script>
+    <script src="{% static 'assets/js/core/bootstrap.min.js' %}"></script>
+
+    <!-- jQuery Scrollbar -->
+    <script src="{% static 'assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js' %}"></script>
+
+    <!-- Chart JS -->
+    <script src="{% static 'assets/js/plugin/chart.js/chart.min.js' %}"></script>
+
+    <!-- jQuery Sparkline -->
+    <script src="{% static 'assets/js/plugin/jquery.sparkline/jquery.sparkline.min.js' %}"></script>
+
+    <!-- Chart Circle -->
+    <script src="{% static 'assets/js/plugin/chart-circle/circles.min.js' %}"></script>
+
+    <!-- Datatables -->
+    <script src="{% static 'assets/js/plugin/datatables/datatables.min.js' %}"></script>
+
+    <!-- Bootstrap Notify -->
+    <script src="{% static 'assets/js/plugin/bootstrap-notify/bootstrap-notify.min.js' %}"></script>
+
+    <!-- jQuery Vector Maps -->
+    <script src="{% static 'assets/js/plugin/jsvectormap/jsvectormap.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugin/jsvectormap/world.js' %}"></script>
+
+    <!-- Sweet Alert -->
+    <script src="{% static 'assets/js/plugin/sweetalert/sweetalert.min.js' %}"></script>
+
+    <!-- Kaiadmin JS -->
+    <script src="{% static 'assets/js/kaiadmin.min.js' %}"></script>
+
+    <!-- Kaiadmin DEMO methods, don't include it in your project! -->
+    <script src="{% static 'assets/js/setting-demo.js' %}"></script>
+    <script src="{% static 'assets/js/demo.js' %}"></script>
+    <script>
+      $("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {
+        type: "line",
+        height: "70",
+        width: "100%",
+        lineWidth: "2",
+        lineColor: "#177dff",
+        fillColor: "rgba(23, 125, 255, 0.14)",
+      });
+
+      $("#lineChart2").sparkline([99, 125, 122, 105, 110, 124, 115], {
+        type: "line",
+        height: "70",
+        width: "100%",
+        lineWidth: "2",
+        lineColor: "#f3545d",
+        fillColor: "rgba(243, 84, 93, .14)",
+      });
+
+      $("#lineChart3").sparkline([105, 103, 123, 100, 95, 105, 115], {
+        type: "line",
+        height: "70",
+        width: "100%",
+        lineWidth: "2",
+        lineColor: "#ffa534",
+        fillColor: "rgba(255, 165, 52, .14)",
+      });
+    </script>
+    <style>
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  .container, .container * {
+    visibility: visible !important;
+  }
+  .no-print, .no-print * {
+    display: none !important;
+  }
+  .container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    background: white !important;
+    box-shadow: none !important;
+  }
+}
+</style>
+
+{% if messages %}
+  <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+    {% for message in messages %}
+      <div class="toast align-items-center text-bg-{{ message.tags }} border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+        <div class="d-flex">
+          <div class="toast-body">
+            {{ message }}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+      var toastList = toastElList.map(function (toastEl) {
+        var toast = new bootstrap.Toast(toastEl)
+        toast.show()
+        return toast
+      })
+    });
+  </script>
+
+
+
+  
+
+{% endif %}
+
+
+</body>
+ <script>
+    window.addEventListener('load', function() {
+      document.getElementById('loading-overlay').style.display = 'none';
+    });
+  </script>
+</html>
