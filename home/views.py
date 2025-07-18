@@ -220,7 +220,7 @@ def dashboard_docteur(request):
     # Données spécifiques au médecin connecté
     consultations = Consultation.objects.filter(medecin__user=request.user).select_related('patient', 'medecin')
     examens = Examen.objects.filter(consultation__medecin=personnel, statut='En attente').select_related('consultation__patient')
-    rendez_vous = RendezVous.objects.filter(medecin=personnel, status='En attente').select_related('patient')
+    rendez_vous = RendezVous.objects.filter(medecin=personnel, status='En attente')
     
     # Compteur de notifications
     count_notifications = consultations.exclude(status='Terminée').count()
