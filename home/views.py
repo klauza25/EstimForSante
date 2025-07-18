@@ -581,22 +581,33 @@ def detail_ordonnance(request, id):
 
 
 # === EXAMENS ===
+# views.py
+
 @login_required
 def ajouter_examen(request, consultation_id):
     """
-    View to add an Examen linked to a Consultation.
+    Vue pour ajouter un examen à une consultation
     """
+    if request.user.role not in ['medecin', 'infirmier']:
+        messages.error(request, "Accès refusé.")
+        return redirect('home')
+
     consultation = get_object_or_404(Consultation, id=consultation_id)
-    if request.method == 'POST':
+
+    if request.method == "POST":
         form = ExamenForm(request.POST)
         if form.is_valid():
             examen = form.save(commit=False)
             examen.consultation = consultation
+            examen.patient = consultation.patient  # ✅ Récupère le patient depuis la consultation
             examen.save()
             messages.success(request, "Examen ajouté avec succès.")
             return redirect('consultation_detail', consultation_id=consultation.id)
+        else:
+            messages.error(request, "Erreur lors de l'ajout de l'examen.")
     else:
         form = ExamenForm()
+
     return render(request, 'examens/ajouter_examen.html', {
         'form': form,
         'consultation': consultation

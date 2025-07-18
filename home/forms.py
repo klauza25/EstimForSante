@@ -263,37 +263,34 @@ class OrdonnanceForm(forms.ModelForm):
         }
 
 
+# forms.py
 
 class ExamenForm(forms.ModelForm):
     class Meta:
         model = Examen
-        fields = ['nom', 'date_examen', 'resultat', 'statut']
+        fields = ['nom', 'resultat', 'statut']
         widgets = {
-            'date_examen': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'resultat': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
             'nom': forms.TextInput(attrs={'class': 'form-control'}),
-            'statut': forms.Select(attrs={'class': 'form-control'}),
+            'resultat': forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
+            'statut': forms.Select(attrs={'class': 'form-select'}),
         }
+        labels = {
+            'nom': 'Nom de l’examen',
+            'resultat': 'Résultat',
+            'statut': 'Statut'
+        }
+        
 
+# forms.py
 
 class ResultatExamenForm(forms.ModelForm):
     class Meta:
         model = Examen
         fields = ['resultat', 'statut']
         widgets = {
-            'resultat': forms.Textarea(attrs={
-                'class': 'form-control',
-                'rows': 4,
-                'placeholder': 'Résultat de l\'examen'
-            }),
+            'resultat': forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
             'statut': forms.Select(attrs={'class': 'form-select'}),
         }
-        labels = {
-            'resultat': 'Résultat',
-            'statut': 'Statut',
-        }
-        
-
 
 class RendezVousForm(forms.ModelForm):
     class Meta:
