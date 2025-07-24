@@ -78,59 +78,78 @@
       </div>
     </form>
 
-    <!-- Tableau des paiements -->
-    <div class="card shadow-sm border-0 rounded-3">
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>{% trans "Patient" %}</th>
-                <th>{% trans "Médecin" %}</th>
-                <th>{% trans "Date du paiement" %}</th>
-                <th>{% trans "Type de paiement" %}</th>
-                <th>{% trans "Montant total" %}</th>
-                <th>{% trans "Montant payé" %}</th>
-                <th>{% trans "Différence rendue" %}</th>
-                <th>{% trans "Statut" %}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for paiement in paiements %}
-              <tr>
-                <td>{{ paiement.consultation.patient }}</td>
-                <td>{{ paiement.consultation.medecin }}</td>
-                <td>{{ paiement.date_paiement|date:"d/m/Y H:i" }}</td>
-                <td><span class="badge bg-primary">{{ paiement.get_type_paiement_display }}</span></td>
-                <td><strong>{{ paiement.montant_total }} XAF</strong></td>
-                <td>{{ paiement.montant_paye }} XAF</td>
-                <td>
-                  {% if paiement.difference_rendue > 0 %}
-                    <span class="text-warning fw-bold">
-                      {{ paiement.difference_rendue }} XAF
-                    </span>
-                  {% else %}
-                    —
-                  {% endif %}
-                </td>
-                <td>
-                  <span class="badge text-success bg-{{ paiement.status|lower }}">
-                    {{ paiement.get_status_display }}
-                  </span>
-                </td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="8" class="text-center text-muted py-4">
-                  <i class="fas fa-receipt fa-2x text-secondary mb-2"></i><br/>
-                  {% trans "Aucun paiement trouvé." %}
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
+  <!-- Tableau des paiements -->
+<div class="card shadow-sm border-0 rounded-3">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>{% trans "Patient" %}</th>
+            <th>{% trans "Éléments payés" %}</th>  {# Changed header from Médecin to Éléments payés #}
+            <th>{% trans "Date du paiement" %}</th>
+            <th>{% trans "Type de paiement" %}</th>
+            <th>{% trans "Montant total" %}</th>
+            <th>{% trans "Montant payé" %}</th>
+            <th>{% trans "Différence rendue" %}</th>
+            <th>{% trans "Statut" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for paiement in paiements %}
+          <tr>
+            <td>{{ paiement.consultation.patient }}</td>
+          <td>
+  {% if paiement.consultation %}
+    {{ paiement.consultation.type_consultation }},
+  {% endif %}
+  {% if paiement.examen %}
+    {% if paiement.consultation %}<br>{% endif %}
+    {{ paiement.examen.nom }},
+  {% endif %}
+  {% if paiement.ordonnance %}
+    {% if paiement.consultation or paiement.examen %}<br>{% endif %}
+    {{ paiement.ordonnance.nom_medicament }},
+  {% endif %}
+  {% if not paiement.consultation and not paiement.examen and not paiement.ordonnance %}
+    —
+  {% endif %}
+</td>
+
+ {# Replace medecin with elements payés #}
+            <td>{{ paiement.date_paiement|date:"d/m/Y H:i" }}</td>
+            <td><span class="badge bg-primary">{{ paiement.get_type_paiement_display }}</span></td>
+            <td><strong>{{ paiement.montant_total }} XAF</strong></td>
+            <td>{{ paiement.montant_paye }} XAF</td>
+            <td>
+              {% if paiement.difference_rendue > 0 %}
+                <span class="text-warning fw-bold">
+                  {{ paiement.difference_rendue }} XAF
+                </span>
+              {% else %}
+                —
+              {% endif %}
+            </td>
+            <td>
+              <span class="badge text-success bg-{{ paiement.status|lower }}">
+                {{ paiement.get_status_display }}
+              </span>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8" class="text-center text-muted py-4">
+              <i class="fas fa-receipt fa-2x text-secondary mb-2"></i><br/>
+              {% trans "Aucun paiement trouvé." %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 
       <!-- Pagination -->
       <div class="card-footer d-flex justify-content-between align-items-center">

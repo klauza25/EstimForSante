@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-3#mv3r5fdff0tzmul1sjx72p9xdgpq-q5&-n4zruo(c))2p98q'
 DEBUG = True
 SESSION_COOKIE_AGE = 3600  # 1 heure
-host = '192.168.100.114'
+host = '10.5.50.182'
 
 ALLOWED_HOSTS = []
 

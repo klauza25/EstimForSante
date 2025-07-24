@@ -15,7 +15,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.db.models import Q
 from .models import STATUS_PAIEMENT_CHOICES, Ordonnance, Consultation, Paiement, Patient, Personnel, Examen, Medicament, RendezVous
-from .forms import MOTIF_CHOICES, ConsultationForm, PaiementForm, PatientForm, OrdonnanceForm, ExamenForm, RendezVousForm, ResultatExamenForm
+from .forms import MOTIF_CHOICES, ConsultationForm, ExamenForm, PaiementForm, PatientForm, OrdonnanceForm, RendezVousForm, ResultatExamenForm
 from django.contrib.auth import get_user_model, login, logout,authenticate
 from django.core.exceptions import ValidationError
 import logging
@@ -553,7 +553,7 @@ def creer_ordonnance(request, consultation_id):
     return render(request, 'ordonnances/creer.html', {
         'form': form,
         'consultation': consultation,
-        'COMMON_DRUGS': OrdonnanceForm.COMMON_DRUGS,
+        
         'title': _("Créer une ordonnance")
     })
 

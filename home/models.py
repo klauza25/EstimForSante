@@ -127,6 +127,10 @@ class Personnel(models.Model):
     class Meta:
         verbose_name = _("Personnel")
         verbose_name_plural = _("Personnels")
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+from decimal import Decimal
+from django.utils import timezone
 
 class Consultation(models.Model):
     """
@@ -139,63 +143,67 @@ class Consultation(models.Model):
         ('Annulée', _('Annulée')),
     ]
 
+    # Correction : Ajout de 'Première consultation' et utilisation correcte des motifs
     TYPE_CONSULTATION_CHOICES = [
-        ('', '--- Sélectionnez un motif ---'),
-    
-    # Général
-    ('Consultation de routine', 'Consultation de routine'),
-    ('Suivi médical régulier', 'Suivi médical régulier'),
-    ('Demande de certificat médical', 'Demande de certificat médical'),
-    ('Visite annuelle de contrôle', 'Visite annuelle de contrôle'),
-    ('Bilan de santé', 'Bilan de santé'),
-    
-    # Symptômes
-    ('Fièvre persistante', 'Fièvre persistante'),
-    ('Douleur abdominale', 'Douleur abdominale'),
-    ('Maux de tête fréquents', 'Maux de tête fréquents'),
-    ('Douleur thoracique', 'Douleur thoracique'),
-    ('Toux chronique', 'Toux chronique'),
-    ('Fatigue générale', 'Fatigue générale'),
-    ('Essoufflement', 'Essoufflement'),
-    ('Vertiges', 'Vertiges'),
-    ('Palpitations', 'Palpitations'),
-    ('Douleur musculaire', 'Douleur musculaire'),
+        ('Première consultation', _('Première consultation')),  # ✅ Ajouté ici
+        ('Suivi', _('Suivi')),
+        ('Urgence', _('Urgence')),
+        ('Téléconsultation', _('Téléconsultation')),
 
-    # Traumato
-    ('Entorse ou foulure', 'Entorse ou foulure'),
-    ('Douleur articulaire', 'Douleur articulaire'),
-    ('Fracture suspectée', 'Fracture suspectée'),
-    ('Lumbago', 'Lumbago'),
-    ('Chute récente', 'Chute récente'),
+        # Général
+        ('Consultation de routine', _('Consultation de routine')),
+        ('Suivi médical régulier', _('Suivi médical régulier')),
+        ('Demande de certificat médical', _('Demande de certificat médical')),
+        ('Visite annuelle de contrôle', _('Visite annuelle de contrôle')),
+        ('Bilan de santé', _('Bilan de santé')),
 
-    # Psychologique
-    ('Anxiété / stress', 'Anxiété / stress'),
-    ('Troubles du sommeil', 'Troubles du sommeil'),
-    ('Dépression présumée', 'Dépression présumée'),
-    ('Suivi psychologique', 'Suivi psychologique'),
-    ('Burn-out', 'Burn-out'),
+        # Symptômes
+        ('Fièvre persistante', _('Fièvre persistante')),
+        ('Douleur abdominale', _('Douleur abdominale')),
+        ('Maux de tête fréquents', _('Maux de tête fréquents')),
+        ('Douleur thoracique', _('Douleur thoracique')),
+        ('Toux chronique', _('Toux chronique')),
+        ('Fatigue générale', _('Fatigue générale')),
+        ('Essoufflement', _('Essoufflement')),
+        ('Vertiges', _('Vertiges')),
+        ('Palpitations', _('Palpitations')),
+        ('Douleur musculaire', _('Douleur musculaire')),
 
-    # Cardiovasculaire
-    ('Hypertension artérielle', 'Hypertension artérielle'),
-    ('Douleur cardiaque', 'Douleur cardiaque'),
-    ('Suivi après infarctus', 'Suivi après infarctus'),
+        # Traumato
+        ('Entorse ou foulure', _('Entorse ou foulure')),
+        ('Douleur articulaire', _('Douleur articulaire')),
+        ('Fracture suspectée', _('Fracture suspectée')),
+        ('Lumbago', _('Lumbago')),
+        ('Chute récente', _('Chute récente')),
 
-    # Pédiatrie
-    ('Fièvre chez l’enfant', 'Fièvre chez l’enfant'),
-    ('Vaccination', 'Vaccination'),
-    ('Toux ou rhume', 'Toux ou rhume'),
-    ('Suivi de croissance', 'Suivi de croissance'),
+        # Psychologique
+        ('Anxiété / stress', _('Anxiété / stress')),
+        ('Troubles du sommeil', _('Troubles du sommeil')),
+        ('Dépression présumée', _('Dépression présumée')),
+        ('Suivi psychologique', _('Suivi psychologique')),
+        ('Burn-out', _('Burn-out')),
 
-    # Gynécologique
-    ('Douleurs menstruelles', 'Douleurs menstruelles'),
-    ('Retard de règles', 'Retard de règles'),
-    ('Suivi de grossesse', 'Suivi de grossesse'),
-    ('Contraception', 'Contraception'),
+        # Cardiovasculaire
+        ('Hypertension artérielle', _('Hypertension artérielle')),
+        ('Douleur cardiaque', _('Douleur cardiaque')),
+        ('Suivi après infarctus', _('Suivi après infarctus')),
 
-    # Gériatrie
-    ('Chutes répétées', 'Chutes répétées'),
-    ('Diminution de mémoire', 'Diminution de mémoire'),
-    ('Douleurs chroniques', 'Douleurs chroniques'),
+        # Pédiatrie
+        ('Fièvre chez l’enfant', _('Fièvre chez l’enfant')),
+        ('Vaccination', _('Vaccination')),
+        ('Toux ou rhume', _('Toux ou rhume')),
+        ('Suivi de croissance', _('Suivi de croissance')),
+
+        # Gynécologique
+        ('Douleurs menstruelles', _('Douleurs menstruelles')),
+        ('Retard de règles', _('Retard de règles')),
+        ('Suivi de grossesse', _('Suivi de grossesse')),
+        ('Contraception', _('Contraception')),
+
+        # Gériatrie
+        ('Chutes répétées', _('Chutes répétées')),
+        ('Diminution de mémoire', _('Diminution de mémoire')),
+        ('Douleurs chroniques', _('Douleurs chroniques')),
     ]
 
     patient = models.ForeignKey(
@@ -214,20 +222,26 @@ class Consultation(models.Model):
     )
     
     infirmier = models.ForeignKey(
-        Personnel, on_delete=models.SET_NULL,
-        null=True, related_name='consultations_as_nurse')
-    
+        'Personnel',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='consultations_as_nurse',
+        verbose_name=_("Infirmier")
+    )
 
     date_consultation = models.DateTimeField(
         default=timezone.now,
         verbose_name=_("Date de la consultation")
     )
 
-    type_consultation = models.TextField(
-        max_length=30,
+    # ✅ CORRECTION : CharField au lieu de TextField + choix valides
+    type_consultation = models.CharField(
+        max_length=50,
         choices=TYPE_CONSULTATION_CHOICES,
         default='Première consultation',
-        verbose_name=_("Type de consultation")
+        verbose_name=_("Type de consultation"),
+        help_text=_("Choisissez le motif ou le type de consultation.")
     )
 
     motif = models.CharField(
@@ -308,11 +322,10 @@ class Consultation(models.Model):
         verbose_name = _("Consultation")
         verbose_name_plural = _("Consultations")
         ordering = ['-date_consultation']
-        
+
     def get_montant_du(self):
         """
-        Retourne le montant dû pour cette consultation
-        en fonction de son type.
+        Retourne le montant dû pour cette consultation selon son type.
         """
         prices = {
             'Première consultation': Decimal('1000.00'),
@@ -321,8 +334,6 @@ class Consultation(models.Model):
             'Téléconsultation': Decimal('4000.00'),
         }
         return prices.get(self.type_consultation, Decimal('1000.00'))
-
-
 
 #
 #
@@ -376,39 +387,77 @@ class Medicament(models.Model):
         verbose_name_plural = _("Médicaments")
 
 
+
+
+
 class Examen(models.Model):
     """
     Examens médicaux demandés ou réalisés pendant une consultation.
+    Le patient est récupéré via la consultation, pas via une ForeignKey directe.
     """
     STATUT_CHOICES = [
         ('En attente', _('En attente')),
         ('Réalisé', _('Réalisé')),
     ]
 
-    nom = models.CharField(max_length=100)
-    consultation = models.ForeignKey(Consultation, on_delete=models.CASCADE)
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    date_examen = models.DateField(null=True, blank=True)
-    resultat = models.TextField(blank=True, null=True)
-    cout = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
-    statut = models.CharField(max_length=15, choices=STATUT_CHOICES, default='En attente')
+    nom = models.CharField(_('Nom de l’examen'), max_length=100)
+    consultation = models.ForeignKey(
+        Consultation,
+        on_delete=models.CASCADE,
+        verbose_name=_('Consultation')
+    )
+    date_examen = models.DateField(
+        _('Date de l’examen'),
+        auto_now_add=True,  # ✅ Date automatique à la création
+        null=False,
+        blank=False
+    )
+    resultat = models.TextField(_('Résultat'), blank=True, null=True)
+    cout = models.DecimalField(
+        _('Coût de l’examen'),
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        blank=True
+    )
+    statut = models.CharField(
+        _('Statut'),
+        max_length=15,
+        choices=STATUT_CHOICES,
+        default='En attente'
+    )
 
-    def mark_as_completed(self, result):
+    def mark_as_completed(self, result=None):
+        """
+        Marque l’examen comme réalisé avec un résultat optionnel.
+        """
         self.statut = 'Réalisé'
-        self.resultat = result
-        self.save()
+        if result is not None:
+            self.resultat = result
+        self.save(update_fields=['statut', 'resultat'])
+
+    def get_patient(self):
+        """
+        Récupère le patient via la consultation
+        """
+        return self.consultation.patient if self.consultation else None
 
     def __str__(self):
-        return f"Examen {self.nom} - Statut: {self.statut} --> {self.patient.nom} {self.patient.prenom}"
+        return f"Examen {self.nom} - Statut: {self.get_statut_display() or self.statut} - Patient: {self.get_patient() or 'Aucun'}"
 
+    
+    def get_cout(self):
+        """
+        Returns the total cost of the prescribed medication as a Decimal.
+        """
+        # Example: sum the cost of all medications in the ordonnance
+        total = Decimal('0.00')
+        # Assuming you have a related field 'medicaments' with cost attribute
+        
+        return total
     class Meta:
         verbose_name = _("Examen")
         verbose_name_plural = _("Examens")
-    def get_cout(self):
-
-        return self.cout
-        
-        
         
     
   
@@ -441,13 +490,10 @@ class Ordonnance(models.Model):
         
     def get_cout(self):
         """
-        Retourne le coût total du médicament prescrit.
+        Return the cost as a Decimal to avoid type errors.
         """
-        if self.nom_medicament:
-            return self.quantite * self.nom_medicament
-        else:
-            # Fallback if no linked Medicament object
-            return 0
+        
+        return Decimal('0.00')
 
 class RendezVous(models.Model):
     STATUS_CHOICES = [

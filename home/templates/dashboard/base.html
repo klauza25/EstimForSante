@@ -186,13 +186,13 @@ body {
         <li class="nav-item">
   <a data-bs-toggle="collapse" href="#paiement">
     <i class="fas fa-coins me-2"></i>
-    <p>Payments</p>
+    <p>Paiments</p>
     <span class="caret"></span>
   </a>
   <div class="collapse" id="paiement">
     <ul class="nav nav-collapse">
-      <li><a href="{% url 'liste_paiements' %}" class="sub-item">View all payments</a></li>
-      <li><a href="{% url 'caisse' %}" class="sub-item">Payment reports</a></li>
+      <li><a href="{% url 'liste_paiements' %}" class="sub-item">Tous les paiements </a></li>
+      <li><a href="{% url 'caisse' %}" class="sub-item">rapport paiements</a></li>
     </ul>
   </div>
 </li>
@@ -495,7 +495,7 @@ body {
            id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="User menu">
           <!-- Avatar -->
           <div class="avatar-md me-3 position-relative">
-            <img src="{% static 'assets/img/profile2.jpg' %}" alt="Profil"
+            <img src="{% static 'assets/img/profile.jpg' %}" alt="Profil"
                  class="avatar-img rounded-circle border border-primary shadow-sm"
                  style="width: 60px; height: 60px;">
             <!-- Statut en ligne -->

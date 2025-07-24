@@ -207,10 +207,10 @@
               <!-- Actions -->
               {% if request.user.role in 'accueil,medecin' %}
               <td class="text-end action-btns">
-                <a href="{% url 'modifier_patient' patient.id %}" class="btn btn-sm btn-warning" title="Modifier">
+                <a href="{% url 'modifier_patient' patient.id %}" class="btn btn-sm btn-warning mt-4 " title="Modifier">
                   <i class="fas fa-edit"></i>
                 </a>
-                <a href="{% url 'patient_detail' patient.id %}" class="btn btn-sm btn-success" title="Détail">
+                <a href="{% url 'patient_detail' patient.id %}" class="btn btn-sm btn-success mb-4" title="Détail">
                   <i class="fas fa-eye"></i>
                 </a>
                 <button type="button" class="btn btn-sm btn-danger" title="Supprimer"
