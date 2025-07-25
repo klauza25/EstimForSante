@@ -1,23 +1,21 @@
-# home/urls.py
-
 from django.urls import path
 from . import views
+from django.conf.urls import handler404
+from home.views import handler404_view
+
+handler404 = 'home.views.handler404_view'
 
 
 urlpatterns = [
     # === Accueil & Auth ===
     path('', views.home, name='home'),
-  
     path('accounts/login/', views.custom_login, name='login'),
     path('accounts/logout/', views.custom_logout, name='logout'),  # Si tu as ta propre vue de logout
-
-
     # === Dashboard par rôle ===
     path('dashboard/docteur/', views.dashboard_docteur, name='dashboard_docteur'),
     path('dashboard/infirmier/', views.dashboard_infirmier, name='dashboard_infirmier'),
     path('dashboard/accueil/', views.dashboard_accueil, name='dashboard_accueil'),
     path('dashboard/pharmacien/', views.dashboard_pharmacien, name='dashboard_pharmacien'),  # À vérifier
-
     # === Patients ===
     path('patients/', views.liste_patients, name='liste_patients'),
     path('patients/<int:patient_id>/modifier/', views.modifier_patient, name='modifier_patient'),

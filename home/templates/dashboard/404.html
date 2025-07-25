@@ -1,0 +1,102 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+{% block title %}Page non trouvée{% endblock %}
+
+{% block content %}
+<style>
+  .error-container {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  }
+
+  .error-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    max-width: 500px;
+    width: 100%;
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .error-icon {
+    font-size: 5rem;
+    color: #0d6efd;
+    margin-bottom: 1rem;
+  }
+
+  .error-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+
+  .error-message {
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+  }
+
+  .btn-home {
+    background: #0d6efd;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+  }
+
+  .btn-home:hover {
+    background: #0b5ed7;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+  }
+
+  .btn-outline-primary {
+    border-color: #0d6efd;
+    color: #0d6efd;
+  }
+
+  .btn-outline-primary:hover {
+    background: #0d6efd;
+    color: white;
+  }
+</style>
+
+<div class="error-container">
+  <div class="error-card">
+    <div class="error-icon">
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    <h1 class="error-title">404</h1>
+    <h2>Page non trouvée</h2>
+    <p class="error-message">
+      Désolé, la page que vous recherchez n'existe pas ou a été déplacée.
+    </p>
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <a href="{% url 'home' %}" class="btn btn-home text-white">
+        <i class="fas fa-home me-2"></i> Retour à l'accueil
+      </a>
+      <a href="javascript:history.back()" class="btn btn-outline-primary">
+        <i class="fas fa-arrow-left me-2"></i> Retour en arrière
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

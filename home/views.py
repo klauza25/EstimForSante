@@ -1,6 +1,5 @@
 # views.py
 
-# === IMPORTS ===
 from decimal import Decimal
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.auth.models import User
@@ -27,7 +26,10 @@ import requests
 from django.http import JsonResponse
 from .models import Medicament
 from django.utils.translation import gettext as _, gettext_lazy as _l
+# views.py
 
+def handler404_view(request, exception=None):
+    return render(request, '404.html', status=404)
 
 logger = logging.getLogger(__name__)
 User = get_user_model()

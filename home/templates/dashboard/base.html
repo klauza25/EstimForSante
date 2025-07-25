@@ -346,10 +346,10 @@ body {
 <nav class="navbar navbar-header navbar-expand-lg border-bottom shadow-sm bg-white">
   <div class="container-fluid">
 
-    <!-- Titre dynamique -->
+    <!-- Logo + Titre (toujours visible) -->
     <div class="d-flex align-items-center">
-      <i class="fas fa-user-md me-3 text-primary fs-4 animate__animated animate__fadeInLeft"></i>
-      <h4 class="mb-0 fw-semibold text-primary">
+      <i class="fas fa-user-md me-3 text-primary fs-4 d-none d-md-inline"></i>
+      <h5 class="mb-0 fw-semibold text-primary">
         {% if request.user.role == "medecin" %}
           Espace Médecin
         {% elif request.user.role == "infirmier" %}
@@ -361,186 +361,149 @@ body {
         {% else %}
           Espace Utilisateur
         {% endif %}
-      </h4>
+      </h5>
     </div>
 
-    <!-- Menu utilisateur -->
-    <ul class="navbar-nav ms-auto align-items-center gap-3">
+    <!-- Menu utilisateur (côté droit) -->
+    <ul class="navbar-nav align-items-center gap-2">
 
-      <!-- Utilisateurs en ligne -->
+      <!-- Notifications (icône uniquement sur mobile) -->
       <li class="nav-item dropdown">
-        <a class="nav-link position-relative" href="#" id="onlineUserDropdown" role="button"
-           data-bs-toggle="dropdown" aria-expanded="false" title="Utilisateurs en ligne">
-          <i class="fas fa-users-cog fs-5 text-secondary"></i>
-          <span id="online-users-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">
-            {{ count }}
-            <span class="visually-hidden">utilisateurs en ligne</span>
-          </span>
+        <a class="nav-link position-relative" href="#" id="notifDropdown" role="button"
+           data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="fa fa-bell fs-5 text-secondary"></i>
+          {% if count_notifications > 0 %}
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              {{ count_notifications }}
+            </span>
+          {% endif %}
         </a>
-
-        <ul class="dropdown-menu dropdown-menu-end shadow-sm py-0" aria-labelledby="onlineUserDropdown">
-          <li><h6 class="dropdown-header py-2">Qui est connecté ?</h6></li>
-          <li>
-            <div id="online-users-list" class="px-0 small">
-              <div class="container py-0">
-                <div class="card shadow-lg border-0 rounded-4 mx-auto" style="max-width: 700px;">
-                  <div class="card-header bg-gradient text-primary text-center" style="background: linear-gradient(45deg, #0d6efd, #6610f2);">
-                    <h4 class="mb-0">
-                      <i class="fas fa-user-group"></i> Utilisateurs en ligne : 
-                      <span class="fw-bold">{{ count }}</span>
-                    </h4>
-                  </div>
-                  <div class="card-body p-1">
-                    <ul class="list-group list-group-flush">
-                      {% for user in active_users %}
-                      <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center gap-2">
-                          <i class="bi bi-person-circle fs-4 text-primary"></i>
-                          <span class="fw-semibold">{{ user.username }}</span>
-                          <span class="fw-semibold text-danger ms-2">{{ user.login_time|date:"H:i:s" }}</span>
-                        </div>
-                        <span class="badge bg-success fs-4 rounded-pill">
-                          <span class="spinner-grow">●</span> En ligne
-                        </span>
-                      </li>
-                      {% empty %}
-                      <li class="list-group-item text-muted text-center">
-                        Aucun utilisateur en ligne pour le moment.
-                      </li>
-                      {% endfor %}
-                    </ul>
-                  </div>
-                </div>
+        <ul class="dropdown-menu dropdown-menu-end shadow-sm py-0" aria-labelledby="notifDropdown">
+          <li><h6 class="dropdown-header py-3">Notifications</h6></li>
+          {% if consultations %}
+            <li>
+              <div class="table-responsive" style="max-height: 180px; overflow-y: auto;">
+                <table class="table table-hover mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Patient</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for consultation in consultations|slice:":3" %}
+                      {% if consultation.status != "Terminée" %}
+                        <tr>
+                          <td class="small">{{ consultation.patient.nom }} {{ consultation.patient.prenom }}</td>
+                          <td>
+                            <a href="{% url 'patient_detail' consultation.patient.id %}" 
+                               class="btn btn-sm btn-outline-primary" title="Détails">
+                              <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'update_consultation' consultation.id %}" 
+                               class="btn btn-sm btn-primary" title="Modifier">
+                              <i class="fas fa-edit"></i>
+                            </a>
+                          </td>
+                        </tr>
+                      {% endif %}
+                    {% endfor %}
+                  </tbody>
+                </table>
               </div>
-            </div>
-          </li>
-          <li><hr class="dropdown-divider m-0"></li>
+            </li>
+            <li><hr class="dropdown-divider m-0"></li>
+          {% else %}
+            <li><span class="dropdown-item text-muted small py-2">Aucune notification</span></li>
+            <li><hr class="dropdown-divider m-0"></li>
+          {% endif %}
           <li>
-            <a class="dropdown-item text-center py-2 small text-primary fw-bold" href="{% url 'users_online' %}">
-              Voir tous les utilisateurs en ligne
+            <a class="dropdown-item text-center small text-primary fw-bold py-2" href="{% url 'mes_consultations' %}">
+              Voir toutes les notifications
             </a>
           </li>
         </ul>
       </li>
 
-     <!-- Notifications -->
-<li class="nav-item dropdown">
-  <a class="nav-link position-relative" href="#" id="notifDropdown" role="button"
-     data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifications">
-    <i class="fa fa-bell fs-5 text-secondary"></i>
-    {% if count_notifications > 0 %}
-    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-      {{ count_notifications }}
-    </span>
-    {% endif %}
-  </a>
-
-  <ul class="dropdown-menu dropdown-menu-end shadow-sm py-0" aria-labelledby="notifDropdown">
-    <li><h6 class="dropdown-header py-3">Notifications</h6></li>
-
-    {% if consultations %}
-      <li>
-        <div class="table-responsive" style="max-height: 150px; overflow-y: auto;">
-          <table class="table table-hover mb-0">
-            <thead class="table-light sticky-top bg-white">
-              <tr>
-                <th scope="col">Patient</th>
-                <th scope="col">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for consultation in consultations|slice:":3" %}
-                {% if consultation.status != "Terminée" %}
-                  <tr class="align-middle">
-                    <td class="small">{{ consultation.patient.nom }} {{ consultation.patient.prenom }}</td>
-                    <td>
-                      <a href="{% url 'patient_detail' consultation.patient.id %}" 
-                         class="btn btn-sm btn-outline-primary m-1" title="Voir détails">
-                        <i class="fas fa-eye"></i>
-                      </a>
-                      <a href="{% url 'update_consultation' consultation.id %}" 
-                         class="btn btn-sm btn-primary m-1" title="Consulter">
-                        <i class="fas fa-edit"></i>
-                      </a>
-                    </td>
-                  </tr>
-                {% endif %}
+      <!-- Utilisateurs en ligne (icône uniquement sur mobile) -->
+      <li class="nav-item dropdown">
+        <a class="nav-link position-relative" href="#" id="onlineUserDropdown" role="button"
+           data-bs-toggle="dropdown" aria-expanded="false" title="Utilisateurs en ligne">
+          <i class="fas fa-users-cog fs-5 text-secondary d-md-none"></i>
+          <span class="d-none d-md-inline">👥</span>
+          {% if count %}
+            <span id="online-users-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info d-md-none">
+              {{ count }}
+            </span>
+          {% endif %}
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end shadow-sm py-0" aria-labelledby="onlineUserDropdown">
+          <li><h6 class="dropdown-header py-2">Utilisateurs en ligne</h6></li>
+          <li>
+            <div class="px-2 small" style="max-height: 200px; overflow-y: auto;">
+              {% for user in active_users %}
+                <div class="d-flex justify-content-between align-items-center py-1 px-2">
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-person-circle text-primary"></i>
+                    <small>{{ user.username }}</small>
+                    <small class="text-danger ms-1">{{ user.login_time|date:"H:i" }}</small>
+                  </div>
+                  <span class="badge bg-success rounded-pill"><i class="fas fa-circle fa-xs"></i></span>
+                </div>
+              {% empty %}
+                <div class="text-muted text-center py-2">Aucun utilisateur</div>
               {% endfor %}
-            </tbody>
-          </table>
-        </div>
+            </div>
+          </li>
+          <li><hr class="dropdown-divider m-0"></li>
+          <li>
+            <a class="dropdown-item text-center small text-primary fw-bold py-2" href="{% url 'users_online' %}">
+              Voir tous
+            </a>
+          </li>
+        </ul>
       </li>
-      <li><hr class="dropdown-divider m-0"></li>
-    {% else %}
-      <li><span class="dropdown-item text-muted small py-2">Aucune notification</span></li>
-      <li><hr class="dropdown-divider m-0"></li>
-    {% endif %}
-
-    <li>
-      <a class="dropdown-item text-center small text-primary fw-bold py-2" href="{% url 'mes_consultations' %}">
-        Voir toutes les notifications
-      </a>
-    </li>
-  </ul>
-</li>
-
-<hr class="dropdown-divider m-0"></li>
- 
-</ul>
-
 
       <!-- Profil utilisateur -->
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#"
-           id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="User menu">
+           id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
           <!-- Avatar -->
-          <div class="avatar-md me-3 position-relative">
-            <img src="{% static 'assets/img/profile.jpg' %}" alt="Profil"
-                 class="avatar-img rounded-circle border border-primary shadow-sm"
-                 style="width: 60px; height: 60px;">
-            <!-- Statut en ligne -->
-            <span class="position-absolute bottom-0 end-0 translate-middle badge bg-success rounded-pill p-1"
-                  style="width: 16px; height: 16px;" title="En ligne"></span>
+          <div class="position-relative me-2">
+            <img src="{% static 'assets/img/profile.jpg' %}"
+                 alt="Profil"
+                 class="rounded-circle border border-primary"
+                 style="width: 40px; height: 40px; object-fit: cover;">
+            <span class="position-absolute bottom-0 end-0 translate-middle badge bg-success rounded-circle p-1"
+                  style="width: 10px; height: 10px;" title="En ligne"></span>
           </div>
-
-          <!-- Infos utilisateur (visible sur desktop) -->
-          <div class="d-none d-md-block text-end">
-            <div class="fw-bold text-dark">{{ request.user.username }}</div>
-            <small class="text-muted fst-italic">
-              {{ request.user.get_role_display|capfirst }}
-            </small>
-          </div>
+          <!-- Nom (visible sur desktop) -->
+          <span class="d-none d-md-block text-dark fw-medium">{{ request.user.username }}</span>
         </a>
 
         <!-- Dropdown menu -->
-        <ul class="dropdown-menu dropdown-menu-end shadow-lg py-0" aria-labelledby="userDropdown">
-          <li class="dropdown-header text-truncate">
-            <strong>{{ request.user.username }}</strong><br/>
+        <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="userDropdown">
+          <li class="dropdown-header">
+            <strong>{{ request.user.username }}</strong><br>
             <small class="text-muted">{{ request.user.get_role_display|capfirst }}</small>
           </li>
-          <li><hr class="dropdown-divider m-0"></li>
-
-          <!-- Panel Admin -->
+          <li><hr class="dropdown-divider"></li>
           {% if request.user.is_superuser %}
-          <li>
-            <a class="dropdown-item d-flex align-items-center py-3" href="{% url 'admin:index' %}">
-              <i class="fas fa-shield-alt me-2 text-primary"></i> Panel Administrateur
-            </a>
-          </li>
-          <li><hr class="dropdown-divider m-0"></li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center py-2" href="{% url 'admin:index' %}">
+                <i class="fas fa-shield-alt me-2 text-primary"></i> Panel Administrateur
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
           {% endif %}
-
-          <!-- Statut -->
           <li>
-            <a class="dropdown-item d-flex align-items-center py-3" href="#">
-              <i class="fas fa-circle text-success me-2"></i> Statut : Actif
+            <a class="dropdown-item d-flex align-items-center py-2" href="#">
+              <i class="fas fa-circle text-success me-2"></i> En ligne
             </a>
           </li>
-          <li><hr class="dropdown-divider m-0"></li>
-
-          <!-- Déconnexion -->
+          <li><hr class="dropdown-divider"></li>
           <li>
-            <a class="dropdown-item d-flex align-items-center py-3 text-danger" href="{% url 'logout' %}">
+            <a class="dropdown-item d-flex align-items-center py-2 text-danger" href="{% url 'logout' %}">
               <i class="fas fa-sign-out-alt me-2"></i> Déconnexion
             </a>
           </li>
@@ -549,7 +512,6 @@ body {
     </ul>
   </div>
 </nav>
-
 <!-- Add Animate.css CDN in your base.html head for animations -->
 <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/> -->
 
