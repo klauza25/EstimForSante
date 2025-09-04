@@ -137,9 +137,9 @@ class Consultation(models.Model):
     Représente une consultation médicale dans le système.
     """
     STATUS_CHOICES = [
-        ('Planifiée', _('Planifiée')),
+        ('Planifier', _('Planifier')),
         ('En cours', _('En cours')),
-        ('Terminée', _('Terminée')),
+        ('Terminer', _('Termier')),
         ('Annulée', _('Annulée')),
     ]
 
@@ -397,7 +397,7 @@ class Examen(models.Model):
     """
     STATUT_CHOICES = [
         ('En attente', _('En attente')),
-        ('Réalisé', _('Réalisé')),
+        ('Réaliser', _('Réaliser')),
     ]
 
     nom = models.CharField(_('Nom de l’examen'), max_length=100)
@@ -431,7 +431,7 @@ class Examen(models.Model):
         """
         Marque l’examen comme réalisé avec un résultat optionnel.
         """
-        self.statut = 'Réalisé'
+        self.statut = 'Réaliser'
         if result is not None:
             self.resultat = result
         self.save(update_fields=['statut', 'resultat'])

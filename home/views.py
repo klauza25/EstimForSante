@@ -195,7 +195,9 @@ def mes_consultations(request):
 
     # Récupère les consultations du médecin connecté
     consultations = Consultation.objects.filter(medecin=personnel).select_related('patient')
-
+    consultations = consultations.order_by('-id')
+    
+    
     return render(request, 'dashboard/mes_consultations.html', {
         'consultations': consultations
     })

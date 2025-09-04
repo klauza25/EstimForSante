@@ -206,7 +206,7 @@
               <td>{{ examen.consultation.medecin }}</td>
               <td>{{ examen.date_examen|default:"—" }}</td>
               <td>
-                <span class="badge bg-{{ examen.statut|lower }}">
+                <span class="badge text-success bg-{{ examen.statut|lower }}">
                   {{ examen.get_statut_display }}
                 </span>
               </td>

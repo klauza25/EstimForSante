@@ -27,13 +27,13 @@
           <td>{{ consultation.date_consultation|date:"d/m/Y H:i" }}</td>
           <td>{{ consultation.motif }}</td>
           <td>
-            <span class="badge bg-{{ consultation.status|lower }}">
+            <span class="badge text-success bg-{{ consultation.status|upper }}">
               {{ consultation.get_status_display }}
             </span>
           </td>
           <td>
             <a href="{% url 'consultation_detail' consultation.id %}" class="btn btn-sm btn-outline-primary">
-              <i class="fas fa-eye"></i> Détail
+              <i class="fas fa-eye"></i> Consulter
             </a>
           </td>
         </tr>
