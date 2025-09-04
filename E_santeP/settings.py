@@ -8,9 +8,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-3#mv3r5fdff0tzmul1sjx72p9xdgpq-q5&-n4zruo(c))2p98q'
 DEBUG = True
 SESSION_COOKIE_AGE = 3600  # 1 heure
+# settings.py
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://estimforsante.onrender.com"
+]
 
 
-ALLOWED_HOSTS = ['https://estimforsante.onrender.com','*']
+ALLOWED_HOSTS = ['estimforsante.onrender.com','*']
 
 AUTH_USER_MODEL = 'home.User'
 
